@@ -22,5 +22,17 @@ def check_login(username, password):
         return User.query.filter(User.username.__eq__(username.strip()),
                                  User.password.__eq__(password)).first()
 
+def check_mail_exit(email):
+    if email:
+        return User.query.filter(User.email.__eq__(email)).first()
+
+
+def override_password(email, password):
+    password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
+    user= User.query.filter(User.email.__eq__(email)).first()
+    if user:
+        user.password= password
+        db.session.commit()
+
 def get_user_by_id(user_id):
     return User.query.get(user_id)

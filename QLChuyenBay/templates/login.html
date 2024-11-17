@@ -31,8 +31,17 @@
         <input class="form-check-input" type="checkbox" id="myCheck" name="remember" required>
         <div class="valid-feedback">Valid.</div>
     </div>
+
+    <select class="form-select" aria-label="Default select example">
+        <option selected>Người dùng dịch vụ</option>
+        <option value="1">Người dùng dịch vụ</option>
+        <option value="2">Nhân viên</option>
+        <option value="3">Người quản trị</option>
+    </select>
+
     <div class="mb-3 mt-3">
         <button type="submit" class="btn btn-danger">Đăng nhập</button>
+        <div><a  class="text text-decoration-none" href="{{url_for('user_verify')}}">Bạn quên mật khẩu?</a></div>
     </div>
 </form>
 {%endblock%}

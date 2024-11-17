@@ -29,9 +29,9 @@ class User(BaseModel, UserMixin):
     active = Column(Boolean, default=True)
     joined_date = Column(DateTime, default=datetime.now())
     user_role = Column(Enum(UserRole), default=UserRole.USER)
-
     def __str__(self):
         return self.name
+
 
 
 if __name__=="__main__":
