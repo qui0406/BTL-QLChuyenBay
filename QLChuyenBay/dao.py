@@ -1,6 +1,6 @@
 import json, os
 from QLChuyenBay import app, db
-from QLChuyenBay.models import User
+from QLChuyenBay.models import User, UserRole
 import hashlib
 import re
 
@@ -16,7 +16,7 @@ def check_secure_password(password):
     if re.match(pattern, password):
         return True
 
-def check_login(username, password):
+def check_login(username, password, role= UserRole.USER):
     if username and password:
         password= str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
         return User.query.filter(User.username.__eq__(username.strip()),

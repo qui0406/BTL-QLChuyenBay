@@ -7,7 +7,7 @@ from flask_login import login_user, logout_user
 from enum import Enum
 from flask_mail import *
 import smtplib
-
+from models import UserRole
 
 # @app.errorhandler(404)
 # def page_not_found(error):
@@ -16,7 +16,6 @@ import smtplib
 @app.route("/")
 def home():
     return render_template("index.html")
-
 
 @app.route('/verify', methods=["post", "get"])
 def user_verify():
@@ -102,10 +101,19 @@ def user_login():
             err_msg = "Username hoac password khong chinh xac!!!"
     return render_template('login.html', err_msg=err_msg)
 
+@app.route('/admin-login', methods=['post'])
+def signin_admin():
+    username= request.form.get('username')
+    password = request.form.get('password')
+    user = dao.check_login(username=username, password=password, role=UserRole.ADMIN)
+    if user:
+        login_user(user=user)
+    return redirect('/admin')
 
 @app.route('/user-logout')
 def user_logout():
     logout_user()
+    session.clear()
     return redirect(url_for('user_login'))
 
 @login.user_loader
@@ -113,4 +121,5 @@ def user_load(user_id):
     return dao.get_user_by_id(user_id=user_id)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    from QLChuyenBay.admin import *
+    app.run(debug=True, host='localhost', port=5002)
