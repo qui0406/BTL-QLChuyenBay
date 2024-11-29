@@ -34,14 +34,15 @@ class User(BaseModel, UserMixin):
 class AirPort(BaseModel):
     __table_args__ = {'extend_existing': True}
     name= Column(String(100), nullable=False)
+    # details= relationship('FlightRoute', backref='airport', lazy= True)
 
     def __str__(self):
         return self.name
 
-class FlightRoute(BaseModel):
-    __table_args__ = {'extend_existing': True}
-    airport_from= Column(Integer, ForeignKey(AirPort.id))
-    airport_to= Column(Integer, ForeignKey(AirPort.id))
+# class FlightRoute(BaseModel):
+#     __table_args__ = {'extend_existing': True}
+#     airport_from_id= Column(Integer, ForeignKey(AirPort.id))
+#     airport_to_id= Column(Integer, ForeignKey(AirPort.id))
 
 
 # class Ticket(BaseModel):
@@ -60,19 +61,16 @@ class FlightRoute(BaseModel):
 #     def __str__(self):
 #         return self.name
 
-# class Rule(BaseModel):
-#     __table_args__ = {'extend_existing': True}
-#     min_time_flight= Column(Float, default=0.5)
-#     max_quantity_between_airport= Column(Integer, default=2)
-#     min_time_stay_airport= Column(Float, default= 0.33)
-#     max_time_stay_airport= Column(Float, default= 0.5)
-#     time_book_ticket= Column(Float, default= 12)
-#     time_buy_ticket= Column(Float, default= 4)
-#     created_at= Column(DateTime, default= datetime.now())
-#
+class Rule(BaseModel):
+    __table_args__ = {'extend_existing': True}
+    min_time_flight= Column(Float, default=30)
+    max_quantity_between_airport= Column(Integer, default=2)
+    min_time_stay_airport= Column(Float, default= 20)
+    max_time_stay_airport= Column(Float, default= 30)
+    time_book_ticket= Column(Float, default= 12)
+    time_buy_ticket= Column(Float, default= 4)
+    created_at= Column(DateTime, default= datetime.now())
 
-
-#
 # class FlightSchedule(BaseModel):
 #     __table_args__ = {'extend_existing': True}
 #     i_act= Column(Boolean, default= False)
@@ -86,7 +84,7 @@ class FlightRoute(BaseModel):
 #     ticket2_book_quantity= Column(Integer, default= 0)
 #     price= Column(Float, default=0)
 #
-#     bw_airports = relationship('BetweenAirport', backref='FlightSchedule', lazy= True)
+#     # bw_airports = relationship('BetweenAirport', backref='FlightSchedule', lazy= True)
 #
 #     def __str__(self):
 #         return str(self.id)
@@ -94,12 +92,11 @@ class FlightRoute(BaseModel):
 # class BetweenAirport(BaseModel):
 #     __tablename__ = 'between_airport'
 #     __table_args__ = {'extend_existing': True}
-#     airport_id = Column(Integer, ForeignKey(AirPort.id))
-#     flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id))
+#     # airport_id = Column(Integer, ForeignKey(AirPort.id))
+#     # flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id))
 #     time_stay= Column(Float, nullable= False)
 #     note= Column(String(100))
 #     i_del= Column(Boolean, default= False)
-#
 #     is_deleted = Column(Boolean, default=False)
 
 @login.user_loader
@@ -109,6 +106,9 @@ def user_load(user_id):
 if __name__=="__main__":
     with app.app_context():
         pass
+
+        #db.create_all()
+        # pass
         # a1 = AirPort(name="Tân Sơn Nhất")
         # a2 = AirPort(name="Nội Bài")
         # a3 = AirPort(name="Côn Đảo")
@@ -121,4 +121,7 @@ if __name__=="__main__":
         # a10 = AirPort(name="Vinh")
         #
         # db.session.add_all([a1, a2, a3, a4, a5, a6, a7, a8, a9, a10])
+        # db.session.commit()
+        # a = Rule()
+        # db.session.add(a)
         # db.session.commit()

@@ -1,12 +1,13 @@
 import math
+import pdb
+from logging import error
+
 from QLChuyenBay import app, login, otp, mail
 from flask import render_template, request, redirect, url_for, session, jsonify
 import dao
 import cloudinary.uploader
 from flask_login import login_user, logout_user
-from enum import Enum
 from flask_mail import *
-import smtplib
 from models import UserRole
 
 # @app.errorhandler(404)
@@ -116,9 +117,35 @@ def user_logout():
     session.clear()
     return redirect(url_for('user_login'))
 
+@app.route('/api/admin-rule', methods=['post'])
+def save_admin_rules():
+   # data=request.get_json()
+    min_time_flight = request.form.get('min-time-flight'),
+    max_quantity_between_airport = request.form.get('max_quantity_between_airport'),
+    min_time_stay_airport = request.form.get('min_time_stay_airport'),
+    max_time_stay_airport = request.form.get('max_time_stay_airport'),
+    time_book_ticket = request.form.get('time_book_ticket'),
+    time_buy_ticket = request.form.get('time_buy_ticket')
+    sa= dao.save_admin_rules(min_time_flight= min_time_flight,
+                             max_quantity_between_airport= max_quantity_between_airport,
+                             min_time_stay_airport= min_time_stay_airport,
+                             max_time_stay_airport= max_time_stay_airport,
+                             time_book_ticket= time_book_ticket,
+                             time_buy_ticket= time_buy_ticket)
+    if not sa:
+        return {
+            'status': 500,
+            'data': 'error'
+        }
+    return {
+        'status': 200,
+        'data': 'success'
+    }
+
 @login.user_loader
 def user_load(user_id):
     return dao.get_user_by_id(user_id=user_id)
+
 
 if __name__ == '__main__':
     from QLChuyenBay.admin import *

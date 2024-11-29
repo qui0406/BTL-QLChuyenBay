@@ -1,6 +1,6 @@
 import json, os
 from QLChuyenBay import app, db
-from QLChuyenBay.models import User, UserRole
+from QLChuyenBay.models import UserRole, User, Rule
 import hashlib
 import re
 
@@ -33,6 +33,21 @@ def override_password(email, password):
     if user:
         user.password= password
         db.session.commit()
+
+def get_rule_admin():
+    return Rule.query.order_by(Rule.created_at.desc()).first()
+
+def save_admin_rules(min_time_flight, max_quantity_between_airport, min_time_stay_airport, max_time_stay_airport,
+                     time_book_ticket,time_buy_ticket):
+    sa= Rule(min_time_flight= min_time_flight,
+             max_quantity_between_airport= max_quantity_between_airport,
+             min_time_stay_airport= min_time_stay_airport,
+             max_time_stay_airport= max_time_stay_airport,
+             time_book_ticket= time_book_ticket
+             ,time_buy_ticket= time_buy_ticket)
+    db.session.add(sa)
+    db.session.commit()
+    return sa
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
