@@ -3,4 +3,49 @@
 {%block body%}
 <h1 class="text text-center text-success">QUẢN LÝ TUYẾN BAY</h1>
 
+<form method="POST" action="{{ url_for('save_route_flight') }}">
+    <div class="d-flex justify-content-around">
+        <div class="row mt-3">
+            <label for="departure-airport" class="form-label">Chọn tuyến bay đi:</label>
+            <input class="form-control" list="list-departure-airport" name="departure-airport" id="departure-airport">
+            <datalist id="list-departure-airport">
+                {%for i in list_airport%}
+                    <option value="{{i.name}}">
+                {%endfor%}
+            </datalist>
+        </div>
+        <div class="row mt-3">
+            <label for="arrival-airport" class="form-label">Chọn tuyến bay đến:</label>
+            <input class="form-control" list="list-arrival-airport" name="arrival-airport" id="arrival-airport">
+            <datalist id="list-arrival-airport">
+                {%for i in list_airport%}
+                    <option value="{{i.name}}">
+                {%endfor%}
+            </datalist>
+        </div>
+    </div>
+    <div class="row mt-3 d-flex justify-content-around">
+        <button type="submit" class="btn btn-success">Thêm tuyến bay</button>
+    </div>
+</form>
+
+<table class="table mt-4">
+    <tr>
+        <th>Sân bay đi</th>
+        <th>Sân bay đến</th>
+        <th>Thời gian tạo</th>
+        <th></th>
+    </tr>
+    {%for rl in route_list %}
+    <tr>
+        <td>{{list_airport[rl.departure_airport_id]}}</td>
+        <td>{{list_airport[rl.arrival_airport_id]}}</td>
+        <td>{{rl.created_date}}</td>
+        <td>
+            <button type="submit" id="delete_route" class="btn btn-danger">Xóa</button>
+        </td>
+    </tr>
+    {%endfor%}
+</table>
+
 {%endblock%}

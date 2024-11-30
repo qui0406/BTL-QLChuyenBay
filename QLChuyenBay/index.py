@@ -142,6 +142,21 @@ def save_admin_rules():
         'data': 'success'
     }
 
+@app.route('/api/admin-route-flight', methods=['post'])
+def save_route_flight():
+    departure_airport= request.form.get('departure-airport')
+    arrival_airport= request.form.get('arrival-airport')
+    fr= dao.change_airport_to_id(departure_airport, arrival_airport)
+    if not fr:
+        return {
+            'status': 500,
+            'data': 'error'
+        }
+    return {
+        'status': 200,
+        'data': 'success'
+    }
+
 @login.user_loader
 def user_load(user_id):
     return dao.get_user_by_id(user_id=user_id)

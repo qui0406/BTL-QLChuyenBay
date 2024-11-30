@@ -12,6 +12,7 @@ class BaseModel(db.Model):
     __abstract__= True
     id = Column(Integer, primary_key=True, autoincrement=True)
 
+
 class UserRole(UserEnum):
     ADMIN = 1
     STAFF = 2
@@ -31,6 +32,16 @@ class User(BaseModel, UserMixin):
     def __str__(self):
         return self.name
 
+class Rule(BaseModel):
+    __table_args__ = {'extend_existing': True}
+    min_time_flight= Column(Float, default=30)
+    max_quantity_between_airport= Column(Integer, default=2)
+    min_time_stay_airport= Column(Float, default= 20)
+    max_time_stay_airport= Column(Float, default= 30)
+    time_book_ticket= Column(Float, default= 12)
+    time_buy_ticket= Column(Float, default= 4)
+    created_at= Column(DateTime, default= datetime.now())
+
 class AirPort(BaseModel):
     __table_args__ = {'extend_existing': True}
     name= Column(String(100), nullable=False)
@@ -38,11 +49,15 @@ class AirPort(BaseModel):
 
     def __str__(self):
         return self.name
+#
+class FlightRoute(BaseModel):
+    __table_args__ = {'extend_existing': True}
+    departure_airport_id= Column(Integer, ForeignKey(AirPort.id))
+    arrival_airport_id= Column(Integer, ForeignKey(AirPort.id))
+    created_date = Column(DateTime, default=datetime.now())
 
-# class FlightRoute(BaseModel):
-#     __table_args__ = {'extend_existing': True}
-#     airport_from_id= Column(Integer, ForeignKey(AirPort.id))
-#     airport_to_id= Column(Integer, ForeignKey(AirPort.id))
+    def __str__(self):
+        return str(self.id)
 
 
 # class Ticket(BaseModel):
@@ -61,15 +76,7 @@ class AirPort(BaseModel):
 #     def __str__(self):
 #         return self.name
 
-class Rule(BaseModel):
-    __table_args__ = {'extend_existing': True}
-    min_time_flight= Column(Float, default=30)
-    max_quantity_between_airport= Column(Integer, default=2)
-    min_time_stay_airport= Column(Float, default= 20)
-    max_time_stay_airport= Column(Float, default= 30)
-    time_book_ticket= Column(Float, default= 12)
-    time_buy_ticket= Column(Float, default= 4)
-    created_at= Column(DateTime, default= datetime.now())
+
 
 # class FlightSchedule(BaseModel):
 #     __table_args__ = {'extend_existing': True}
@@ -99,16 +106,16 @@ class Rule(BaseModel):
 #     i_del= Column(Boolean, default= False)
 #     is_deleted = Column(Boolean, default=False)
 
-@login.user_loader
-def user_load(user_id):
-    return dao.get_user_by_id(user_id=user_id)
+# @login.user_loader
+# def user_load(user_id):
+#     return dao.get_user_by_id(user_id=user_id)
 
 if __name__=="__main__":
     with app.app_context():
-        pass
+
 
         #db.create_all()
-        # pass
+        pass
         # a1 = AirPort(name="Tân Sơn Nhất")
         # a2 = AirPort(name="Nội Bài")
         # a3 = AirPort(name="Côn Đảo")

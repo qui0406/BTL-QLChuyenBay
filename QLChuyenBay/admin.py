@@ -31,6 +31,13 @@ class MyAdminIndex(AdminIndexView):
     def index(self):
         return self.render('admin/index.html')
 
+class RouteFlight(MyView):
+    @expose('/')
+    def index(self):
+        list_airport= dao.get_air_port_list()
+        route_list = dao.get_route_list()
+        return self.render('admin/flight_route.html', list_airport= list_airport, route_list= route_list)
+
 class RulesView(MyView):
     @expose('/')
     def index(self):
@@ -48,6 +55,7 @@ admin.add_view(AuthenticatedAdmin(User, db.session))
 admin.add_view(AuthenticatedAdmin(AirPort, db.session))
 # admin.add_view(AuthenticatedAdmin(FlightRoute, db.session))
 
+admin.add_view(RouteFlight(name= 'Tuyến bay'))
 admin.add_view(RulesView(name='Quản lý quy định'))
 admin.add_view(StatsView(name= 'Thống kê'))
 admin.add_view(LogoutView(name= 'Logout'))

@@ -1,6 +1,6 @@
 import json, os
 from QLChuyenBay import app, db
-from QLChuyenBay.models import UserRole, User, Rule
+from QLChuyenBay.models import  User, UserRole, Rule, AirPort, FlightRoute
 import hashlib
 import re
 
@@ -48,6 +48,23 @@ def save_admin_rules(min_time_flight, max_quantity_between_airport, min_time_sta
     db.session.add(sa)
     db.session.commit()
     return sa
+
+def get_air_port_list():
+    return AirPort.query.all()
+
+def change_airport_to_id(departure_airport_id, arrival_airport_id):
+    if departure_airport_id and arrival_airport_id:
+        departure_airport_id= AirPort.query.filter(AirPort.name.__eq__(departure_airport_id)).all()[0].id
+        arrival_airport_id= AirPort.query.filter(AirPort.name.__eq__(arrival_airport_id)).all()[0].id
+        fr= FlightRoute(departure_airport_id= departure_airport_id,
+                        arrival_airport_id= arrival_airport_id)
+        db.session.add(fr)
+        db.session.commit()
+        return fr
+    return None
+
+def get_route_list():
+    return FlightRoute.query.order_by(FlightRoute.created_date.desc()).all()
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
