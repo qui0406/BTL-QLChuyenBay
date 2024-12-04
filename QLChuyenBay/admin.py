@@ -1,61 +1,88 @@
 from QLChuyenBay import app, db
 from flask_admin import Admin, expose, AdminIndexView
-from QLChuyenBay.models import  User, AirPort
+from QLChuyenBay.models import UserRole, User, AirPort, FlightSchedule
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import BaseView
 from flask_login import current_user, logout_user
-from flask import redirect
+from flask import redirect, render_template, abort
 import dao
+
+class Authenticated(ModelView):
+    def is_accessible(self):
+        if current_user.is_authenticated and (current_user.user_role.value == UserRole.ADMIN.value
+                                        or current_user.user_role.value == UserRole.STAFF.value):
+            return True
+        else:
+            return abort(403, 'Unauthorized Access')
+
+
+class AuthenticatedAdminView(BaseView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.user_role.value == UserRole.ADMIN.value
 
 class AuthenticatedAdmin(ModelView):
     def is_accessible(self):
-        return current_user.is_authenticated and current_user.user_role.__eq__('ADMIN')
-
+        return current_user.is_authenticated and current_user.user_role.value == UserRole.ADMIN.value
 
 class AuthenticatedStaff(ModelView):
     def is_accessible(self):
-        return current_user.is_authenticated and current_user.user_role.__eq__('STAFF')
+        return current_user.is_authenticated and current_user.user_role.value == UserRole.STAFF.value
 
-class MyView(BaseView):
-    def is_accessible(self):
-        return current_user.is_authenticated
 
-class LogoutView(MyView):
+class LogoutView(BaseView):
     @expose('/')
     def index(self):
         logout_user()
-        return redirect('/admin')
+        return render_template('login.html')
 
 class MyAdminIndex(AdminIndexView):
     @expose('/')
     def index(self):
         return self.render('admin/index.html')
 
-class RouteFlight(MyView):
+class FlightScheduleView(AuthenticatedStaff):
+    @expose('/')
+    def index(self):
+        rules= dao.get_rule_admin()
+        list_airport = dao.get_air_port_list()
+        route_list = dao.get_route_list()
+        return self.render('admin/flightSche.html',  list_airport= list_airport, route_list= route_list,
+                           rules= rules )
+
+class UserView(AuthenticatedAdmin):
+    column_searchable_list = ['username', 'user_role']
+    form_excluded_columns = ['password']
+    column_list = ('username', 'name')
+    column_labels = dict(username='Tên đăng nhập', name='Họ tên', images="Ảnh đại diện", user_role="Vai trò")
+
+class AirportView(AuthenticatedAdmin):
+    column_searchable_list = ['name']
+    column_labels = dict(name='Tên sân bay')
+
+class RouteFlightView(AuthenticatedAdminView):
     @expose('/')
     def index(self):
         list_airport= dao.get_air_port_list()
         route_list = dao.get_route_list()
-        return self.render('admin/flight_route.html', list_airport= list_airport, route_list= route_list)
+        return self.render('admin/flightRoute.html', list_airport= list_airport,
+                           route_list= route_list)
 
-class RulesView(MyView):
+class RulesView(AuthenticatedAdminView):
     @expose('/')
     def index(self):
         admin_rules= dao.get_rule_admin()
         return self.render('admin/rules.html', admin_rules=admin_rules)
 
-class StatsView(MyView):
+class StatsView(AuthenticatedAdminView):
     @expose('/')
     def index(self):
         return self.render('admin/stats.html')
 
-
 admin= Admin(app=app, name='Quản lý chuyến bay', template_mode='bootstrap4', index_view= MyAdminIndex())
-admin.add_view(AuthenticatedAdmin(User, db.session))
-admin.add_view(AuthenticatedAdmin(AirPort, db.session))
-# admin.add_view(AuthenticatedAdmin(FlightRoute, db.session))
-
-admin.add_view(RouteFlight(name= 'Tuyến bay'))
+admin.add_view(UserView(User, db.session, name='Người dùng'))
+admin.add_view(AirportView(AirPort, db.session, name='Sân bay'))
+admin.add_view(FlightScheduleView(FlightSchedule, db.session, name= 'Lập lịch bay'))
+admin.add_view(RouteFlightView(name= 'Tuyến bay'))
 admin.add_view(RulesView(name='Quản lý quy định'))
 admin.add_view(StatsView(name= 'Thống kê'))
-admin.add_view(LogoutView(name= 'Logout'))
+admin.add_view(LogoutView(name= 'Đăng xuất'))

@@ -6,6 +6,8 @@ from enum import Enum as UserEnum
 import dao
 from flask_login import login_user
 from flask_login import UserMixin
+from datetime import datetime
+from sqlalchemy.ext.declarative import declarative_base
 
 
 class BaseModel(db.Model):
@@ -51,14 +53,47 @@ class AirPort(BaseModel):
         return self.name
 #
 class FlightRoute(BaseModel):
+    __tablename__ = 'flight_routes'
     __table_args__ = {'extend_existing': True}
     departure_airport_id= Column(Integer, ForeignKey(AirPort.id))
     arrival_airport_id= Column(Integer, ForeignKey(AirPort.id))
     created_date = Column(DateTime, default=datetime.now())
+    # flight_sche= relationship('FlightSchedule', backref='flightroute', lazy=True)
+    # flight_schedule = relationship('FlightSchedule', backref='flight_route', lazy=True)
 
     def __str__(self):
         return str(self.id)
 
+class FlightSchedule(BaseModel):
+    __tablename__ = 'flight_schedules'
+    __table_args__ = {'extend_existing': True}
+    i_act= Column(Boolean, default= False)
+    i_del= Column(Boolean, default= False)
+    flight_route_id = Column(Integer, ForeignKey('flight_routes.id'))
+
+    time_start= Column(DateTime, nullable= False)
+    time_end= Column(DateTime, nullable= False)
+    ticket1_quantity= Column(Integer, nullable= False)
+    ticket1_book_quantity= Column(Integer, default= 0)
+    ticket2_quantity= Column(Integer, nullable= False)
+    ticket2_book_quantity= Column(Integer, default= 0)
+    price_type_1= Column(Float, default=0)
+    price_type_2= Column(Float, default=0)
+   # bw_airports = relationship('BetweenAirport', backref='flight_schedules', lazy= True)
+
+    def __str__(self):
+        return str(self.id)
+
+class BetweenAirport(BaseModel):
+    __tablename__ = 'between_airport'
+    __table_args__ = {'extend_existing': True}
+
+    airport_id = Column(Integer, ForeignKey(AirPort.id))
+    flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id))
+
+    time_stay= Column(Float, nullable= False)
+    note= Column(String(100))
+    is_deleted = Column(Boolean, default=False)
 
 # class Ticket(BaseModel):
 #     __table_args__ = {'extend_existing': True}
@@ -78,33 +113,8 @@ class FlightRoute(BaseModel):
 
 
 
-# class FlightSchedule(BaseModel):
-#     __table_args__ = {'extend_existing': True}
-#     i_act= Column(Boolean, default= False)
-#     i_del= Column(Boolean, default= False)
-#
-#     time_start= Column(Float, nullable= False)
-#     time_end= Column(Float, nullable= False)
-#     ticket1_quantity= Column(Integer, nullable= False)
-#     ticket1_book_quantity= Column(Integer, default= 0)
-#     ticket2_quantity= Column(Integer, nullable= False)
-#     ticket2_book_quantity= Column(Integer, default= 0)
-#     price= Column(Float, default=0)
-#
-#     # bw_airports = relationship('BetweenAirport', backref='FlightSchedule', lazy= True)
-#
-#     def __str__(self):
-#         return str(self.id)
-#
-# class BetweenAirport(BaseModel):
-#     __tablename__ = 'between_airport'
-#     __table_args__ = {'extend_existing': True}
-#     # airport_id = Column(Integer, ForeignKey(AirPort.id))
-#     # flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id))
-#     time_stay= Column(Float, nullable= False)
-#     note= Column(String(100))
-#     i_del= Column(Boolean, default= False)
-#     is_deleted = Column(Boolean, default=False)
+
+
 
 # @login.user_loader
 # def user_load(user_id):
@@ -112,10 +122,8 @@ class FlightRoute(BaseModel):
 
 if __name__=="__main__":
     with app.app_context():
-
-
-        #db.create_all()
-        pass
+       #db.create_all()
+       pass
         # a1 = AirPort(name="Tân Sơn Nhất")
         # a2 = AirPort(name="Nội Bài")
         # a3 = AirPort(name="Côn Đảo")

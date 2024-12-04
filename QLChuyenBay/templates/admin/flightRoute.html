@@ -1,0 +1,56 @@
+{% extends 'admin/base.html'%}
+
+{%block body%}
+<h1 class="text text-center text-success">QUẢN LÝ TUYẾN BAY</h1>
+
+<form method="POST" action="{{ url_for('save_route_flight') }}">
+    <div class="d-flex justify-content-around">
+        <div class="row mt-3">
+            <label for="departure" class="form-label">Choose your browser from the list:</label>
+            <input class="form-control" list="ldeparture" name="departure" id="departure">
+            <datalist id="ldeparture">
+                {%for i in list_airport%}
+                <option value="{{i.name}}">
+                    {%endfor%}
+            </datalist>
+        </div>
+        <div class="row mt-3">
+            <label for="arrival" class="form-label">Chọn tuyến bay đến:</label>
+            <input class="form-control" list="larrival" name="arrival" id="arrival">
+            <datalist id="larrival">
+                {%for i in list_airport%}
+                <option value="{{i.name}}">
+                    {%endfor%}
+            </datalist>
+        </div>
+    </div>
+    <div class="row mt-3 d-flex justify-content-around">
+        <button type="submit" onclick="addRoute()" class="btn btn-success">Thêm tuyến bay</button>
+    </div>
+</form>
+
+<table class="table mt-4">
+    <tr>
+        <th>Mã sân bay</th>
+        <th>Sân bay đi</th>
+        <th>Sân bay đến</th>
+        <th>Thời gian tạo</th>
+        <th></th>
+    </tr>
+    {%for rl in route_list %}
+    <tr id="route{{rl.id}}">
+        <td>{{rl.id}}</td>
+        <td>{{list_airport[rl.departure_airport_id -1]}}</td>
+        <td>{{list_airport[rl.arrival_airport_id -1 ]}}</td>
+        <td>{{rl.created_date}}</td>
+        <td>
+            <input type="button" onclick="deleteRoute({{rl.id}})" value="Xóa" class="btn btn-danger"/>
+        </td>
+    </tr>
+    {%endfor%}
+</table>
+{%block js%}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{url_for('static', filename='js/flightRoute.js')}}"></script>
+{%endblock%}
+{%endblock%}

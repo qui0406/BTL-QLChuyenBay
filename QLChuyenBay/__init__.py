@@ -5,7 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 import cloudinary
 from flask_login import LoginManager
 from flask_mail import *
-import random
+from flask_principal import Principal
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:12345678@localhost/qlchuyenbay?charset=utf8mb4'
@@ -28,3 +29,9 @@ otp= randint(000000, 999999)
 mail=Mail(app=app)
 db= SQLAlchemy(app=app)
 login= LoginManager(app=app)
+principals = Principal(app=app)
+
+# babel= Babel(app=app)
+# @babel.localeselector
+# def get_locale():
+#         return 'vi'
