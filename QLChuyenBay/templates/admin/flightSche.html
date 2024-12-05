@@ -2,7 +2,7 @@
 
 {%block body%}
 
-<form method="POST" action="{{url_for('create_flight_schedule')}}">
+<form action="javascript:;">
     <div class="row my-4">
         <div class="col-lg-6">
             <label for="departure_airport_sche" class="form-label">Sân bay đi:</label>
@@ -74,8 +74,9 @@
              class="btn btn-primary mr-3 add-bw-airport">
             Thêm sân bay trung gian (Còn lại {{ rules.max_quantity_between_airport}})
         </div>
-        <button type="submit" class="btn btn-success submit-btn">Tạo lịch chuyến bay</button>
+        <button type="submit" onclick="getData()" class="btn btn-success submit-btn">Tạo lịch chuyến bay</button>
     </div>
+
 </form>
 <h3 class="my-3">LỊCH CHUYẾN BAY ĐÃ TẠO</h3>
 <table class="table mt-4">
@@ -91,12 +92,14 @@
     </tr>
     {% for f in flight_sche_list %}
     <tr>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
+        <th>{{f.id}}</th>
+        <th>{{f.departure_airport}}</th>
+        <th>{{f.arrival_airport}}</th>
+        <th>{{f.time_start}}</th>
+        <th>{{f.time_end}}</th>
+        <th>{{f.ticket1_quantity}}</th>
+        <th>{{f.ticket2_quantity}}</th>
+        <th>{{f.between_list}}</th>
     </tr>
     {%endfor%}
 </table>
@@ -113,7 +116,7 @@
 }
 </script>
 
-<!--<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>-->
-<!--<script src="{{url_for('static', filename='js/flightSche.js')}}"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{url_for('static', filename='js/flightSche.js')}}"></script>
 
 {%endblock%}

@@ -1,9 +1,10 @@
 from QLChuyenBay import app, login, otp, mail
-from flask import render_template, request, redirect, url_for, session, jsonify
+from flask import render_template, request, redirect, url_for, session, jsonify, json, request
 import dao
 import cloudinary.uploader
 from flask_login import login_user, logout_user, login_required
 from flask_mail import *
+import pdb
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from models import UserRole
@@ -111,7 +112,7 @@ def user_logout():
 
 @app.route('/api/admin-rule', methods=['post'])
 def save_admin_rules():
-   # data=request.get_json()
+    #data=request.get_json()
     min_time_flight = request.form.get('min-time-flight'),
     max_quantity_between_airport = request.form.get('max_quantity_between_airport'),
     min_time_stay_airport = request.form.get('min_time_stay_airport'),
@@ -134,17 +135,20 @@ def save_admin_rules():
         'data': 'success'
     }
 
+
 @app.route('/api/admin-route-flight', methods=['post'])
 def save_route_flight():
-    departure_airport= request.form.get('departure')
-    arrival_airport= request.form.get('arrival')
+    data= request.json
+    departure_airport= data.get('depart_airport')
+    arrival_airport= data.get('arrival_airport')
+
     if departure_airport and arrival_airport:
-        fr= dao.change_airport_to_id(departure_airport, arrival_airport)
-        if fr:
-            return {
-                'status': 200,
-                'data': 'success'
-            }
+        fr= dao.add_route_flight(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
+                                        arrival_airport_id= dao.get_id_by_name_airport(arrival_airport))
+        return {
+            'status': 200,
+            'data': 'success'
+        }
     return {
         'status': 500,
         'data': 'error'
@@ -163,17 +167,19 @@ def delete_route(route_id):
         'data': 'error'
     }
 
-@app.route('/api/flight-schedule', methods=['POST'])
+@app.route('/api/flight-schedule', methods=['post'])
 def create_flight_schedule():
+    data = request.json
 
-    depart_airport= int(request.form.get('departure_airport_sche').split(".")[0])
-    arrival_airport= int(request.form.get('arrival_airport_sche').split(".")[0])
-    time_start= request.form.get('time_start')
-    time_end= request.form.get('time_end')
-    quantity_1st_ticket= int(request.form.get('quantity_1st_ticket'))
-    quantity_2nd_ticket= int(request.form.get('quantity_2nd_ticket'))
-    price_type_1= float(request.form.get('price_type_1'))
-    price_type_2= float(request.form.get('price_type_2'))
+    depart_airport= data.get('depart_airport')
+    arrival_airport= data.get('arrival_airport')
+    time_start= data.get('time_start')
+    time_end= data.get('time_end')
+    quantity_1st_ticket= data.get('quantity_1st_ticket')
+    quantity_2nd_ticket= data.get('quantity_2nd_ticket')
+    price_type_1= data.get('price_type_1')
+    price_type_2= data.get('price_type_2')
+    airport_between_list= data.get('airportBetweenList')
 
     try:
         f = dao.create_flight_sche(depart_airport=depart_airport,
@@ -184,21 +190,21 @@ def create_flight_schedule():
                                    quantity_2nd_ticket=quantity_2nd_ticket,
                                    price_type_1= price_type_1,
                                    price_type_2= price_type_2)
-
-        # for a in data['airportBetweenList']:
-        #     bwa= dao.create_between_airport(airport_id=a['ap_id'], flight_sche_id=f.id, time_stay=a['ap_stay'],
-        #                              note=a['ap_note'])
-        #     test = dao.get_flight_sche_list()
-
+        for i in airport_between_list:
+            bwa= dao.create_between_airport(airport_id=int(i['ap_id']),
+                                            flight_sche_id=int(f.id),
+                                            time_stay=float(i['ap_stay']),
+                                            note=i['ap_note'])
     except Exception as err:
-        return {
+        return jsonify({
             'status': 500,
             'data': err
-        }
-    return {
+        })
+    return jsonify({
         'status': 200,
         'data': 'success'
-    }
+    })
+
 
 @login.user_loader
 def user_load(user_id):

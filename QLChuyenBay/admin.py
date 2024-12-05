@@ -46,8 +46,9 @@ class FlightScheduleView(AuthenticatedStaff):
         rules= dao.get_rule_admin()
         list_airport = dao.get_air_port_list()
         route_list = dao.get_route_list()
+        flight_sche_list= dao.get_flight_sche_list()
         return self.render('admin/flightSche.html',  list_airport= list_airport, route_list= route_list,
-                           rules= rules )
+                           rules= rules, flight_sche_list=flight_sche_list )
 
 class UserView(AuthenticatedAdmin):
     column_searchable_list = ['username', 'user_role']

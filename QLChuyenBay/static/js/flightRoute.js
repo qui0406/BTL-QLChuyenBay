@@ -1,22 +1,31 @@
+const btnSubmit= document.querySelector('.btn-submit')
+
+const inp_da= document.getElementById('departure')
+const inp_aa= document.getElementById('arrival')
+
 function addRoute(){
     fetch('/api/admin-route-flight', {
-        method: 'post'
-    }).then(function(res){
-        return res.json()
-    }).then(function(data){
-        if(data.status== 200){
-            console.log(data.status)
-            window.location.reload()
+        method: "POST",
+        body: JSON.stringify({
+            "depart_airport": inp_da.value,
+            "arrival_airport": inp_aa.value
+        }),
+        headers: {
+            "Content-Type": "application/json"
         }
-    }).catch(function(err){
+    }).then(res=>res.json())
+    .then(data=>{
+        Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "Your work has been saved",
+              showConfirmButton: false,
+              timer: 1500});
+        location.reload()
+
+    }).catch(err=>{
         console.error(err)
     })
-    return Swal.fire({
-         position: "top-end",
-         icon: "success",
-         title: "Your work has been saved",
-         showConfirmButton: false,
-         timer: 1500});
 }
 
 function deleteRoute(id){

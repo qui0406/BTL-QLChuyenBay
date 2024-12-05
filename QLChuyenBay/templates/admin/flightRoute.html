@@ -3,7 +3,7 @@
 {%block body%}
 <h1 class="text text-center text-success">QUẢN LÝ TUYẾN BAY</h1>
 
-<form method="POST" action="{{ url_for('save_route_flight') }}">
+<form action="javascript:;">
     <div class="d-flex justify-content-around">
         <div class="row mt-3">
             <label for="departure" class="form-label">Choose your browser from the list:</label>
@@ -25,7 +25,7 @@
         </div>
     </div>
     <div class="row mt-3 d-flex justify-content-around">
-        <button type="submit" onclick="addRoute()" class="btn btn-success">Thêm tuyến bay</button>
+        <button onclick="addRoute()" class="btn btn-success btn-submit">Thêm tuyến bay</button>
     </div>
 </form>
 

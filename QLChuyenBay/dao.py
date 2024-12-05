@@ -34,6 +34,10 @@ def override_password(email, password):
         user.password= password
         db.session.commit()
 
+def get_id_by_name_airport(name):
+
+    return AirPort.query.filter(AirPort.name.__eq__(name)).first().id
+
 def get_rule_admin():
     return Rule.query.order_by(Rule.created_at.desc()).first()
 
@@ -54,10 +58,8 @@ def get_air_port_list():
     return AirPort.query.all()
 
 
-def change_airport_to_id(departure_airport_id, arrival_airport_id):
+def add_route_flight(departure_airport_id, arrival_airport_id):
     if departure_airport_id and arrival_airport_id:
-        departure_airport_id= AirPort.query.filter(AirPort.name.__eq__(departure_airport_id)).all()[0].id
-        arrival_airport_id= AirPort.query.filter(AirPort.name.__eq__(arrival_airport_id)).all()[0].id
         fr= FlightRoute(departure_airport_id= departure_airport_id,
                         arrival_airport_id= arrival_airport_id)
         db.session.add(fr)
@@ -102,73 +104,52 @@ def create_between_airport(airport_id, flight_sche_id, time_stay, note):
     db.session.commit()
     return bwa
 
-#lay json san bay
-def get_airport(id):
-    return AirPort.query.filter(AirPort.id.__eq__(id)).first()
+def get_airport_by_id(a):
+    return AirPort.query.filter(AirPort.id.__eq__(a)).first()
 
-def get_airport_json(id):
-    a= get_airport(id)
+def get_route_json(fr):
+    r= FlightRoute.query.filter(FlightRoute.id.__eq__(fr.flight_route_id)).first()
     return {
-        'id':a.id,
-        'name': a.name
+        'departure_airport': get_airport_by_id(r.departure_airport_id).name,
+        'arrival_airport': get_airport_by_id(r.arrival_airport_id).name,
     }
 
-# lay json tuyen bay
-def get_route(id):
-    return FlightRoute.query.filter(FlightRoute.id.__eq__(id)).first()
-
-def get_route_depart_and_arrival(id):
-    fr= get_route(id)
-    return{
-        'depart_airport': get_airport_json(fr.departure_airport_id),
-        'arrival_airport': get_airport_json(fr.arrival_airport_id)
-    }
-
-#lay json san bay trung gian
-def get_bw_airport_list(bw_id):
-    return BetweenAirport.query.filter(BetweenAirport.flight_sche_id.__eq__(bw_id)).all()
-
-def get_bw_list_json(bw_id):
-    bw_list=BetweenAirport.query.filter(BetweenAirport.flight_sche_id.__eq__(bw_id),
-                                        BetweenAirport.is_deleted.__eq__(False))
-    bw_airport_list= []
-    for bw in bw_list:
-        obj= {
-            'id': bw.id,
-            'airport': get_airport_json(bw.airport_id),
-            'flight_sche': bw.flight_sche_id,
-            'time_stay': bw.time_stay,
-            'note':bw.note
+def get_between_list(fs):
+    bwa_list= BetweenAirport.query.filter(BetweenAirport.flight_sche_id.__eq__(fs.id)).all()
+    airport_between_list = []
+    for bwa in bwa_list:
+        obj = {
+            'id': bwa.id,
+            'airport_id': get_airport_by_id(bwa.id),
+            'flight_sche_id': bwa.flight_sche_id,
+            'time_stay': bwa.time_stay,
+            'note': bwa.note
         }
-        bw_airport_list.append(obj)
-    return bw_airport_list
 
-def get_flight_sche_json(fs_id):
-    f= FlightSchedule.query.filter(FlightSchedule.id.__eq__(fs_id), FlightSchedule.i_del.__eq__(False)).first()
-    bwa= get_bw_list_json(f.id)
-    route= get_route_depart_and_arrival(f.id)
-    return{
-        'id': fs_id,
-        'depart_airport': route['depart_airport']['name'],
-        'arrival_airport': route['arrival_airport']['name'],
-        'is_active': f.i_act,
-        'time_start': f.time_start,
-        'time_end': f.time_end,
-        'quantity_1st_ticket': f.ticket1_quantity,
-        'quantity_1st_ticket_booked': f.ticket1_book_quantity,
-        'price_type_1':f.price_type_1,
-        'quantity_2nd_ticket':f.ticket2_quantity,
-        'quantity_2nd_ticket_booked': f.ticket2_book_quantity,
-        'price_type_2': f.price_type_2,
-        'between_list': {
-            'quantity': len(bwa),
-            'data': bwa
-        }
+        airport_between_list.append(obj)
+    return airport_between_list
+
+def get_flight_sche_json(id):
+    fs= FlightSchedule.query.filter(FlightSchedule.id.__eq__(id)).first()
+    fr= get_route_json(fs)
+    bwl= get_between_list(fs)
+
+    return {
+        "id": fs.id,
+        'departure_airport': fr['departure_airport'],
+        'arrival_airport': fr['arrival_airport'],
+        'time_start': fs.time_start,
+        'time_end': fs.time_end,
+        'ticket1_quantity': fs.ticket1_quantity,
+        'ticket2_quantity': fs.ticket2_quantity,
+        'price_type_1':fs.price_type_1,
+        'price_type_2': fs.price_type_2,
+        'between_list': len(bwl)
     }
 
-def get_flight_sche_list(active=False):
-    f_list = FlightSchedule.query.filter(FlightSchedule.i_act.__eq__(active),
-                                         FlightSchedule.i_del.__eq__(False))
+def get_flight_sche_list():
+    f_list = FlightSchedule.query.all()
+    f_list.reverse()
     flight_sche_list = []
     for f in f_list:
         flight_sche = get_flight_sche_json(f.id)
