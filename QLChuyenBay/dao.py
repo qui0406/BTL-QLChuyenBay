@@ -57,7 +57,6 @@ def save_admin_rules(min_time_flight, max_quantity_between_airport, min_time_sta
 def get_air_port_list():
     return AirPort.query.all()
 
-
 def add_route_flight(departure_airport_id, arrival_airport_id):
     if departure_airport_id and arrival_airport_id:
         fr= FlightRoute(departure_airport_id= departure_airport_id,
@@ -107,25 +106,41 @@ def create_between_airport(airport_id, flight_sche_id, time_stay, note):
 def get_airport_by_id(a):
     return AirPort.query.filter(AirPort.id.__eq__(a)).first()
 
-def get_route_json(fr):
-    r= FlightRoute.query.filter(FlightRoute.id.__eq__(fr.flight_route_id)).first()
-    return {
-        'departure_airport': get_airport_by_id(r.departure_airport_id).name,
-        'arrival_airport': get_airport_by_id(r.arrival_airport_id).name,
-    }
+def get_route_json(fs):
+    r= FlightRoute.query.filter(FlightRoute.id.__eq__(fs.flight_route_id)).first()
+
+    if r:
+        return {
+            'departure_airport': get_airport_by_id(r.departure_airport_id).name,
+            'arrival_airport': get_airport_by_id(r.arrival_airport_id).name
+        }
+    else:
+        return {
+            'departure_airport': '',
+            'arrival_airport': ''
+        }
 
 def get_between_list(fs):
     bwa_list= BetweenAirport.query.filter(BetweenAirport.flight_sche_id.__eq__(fs.id)).all()
     airport_between_list = []
-    for bwa in bwa_list:
+    if bwa_list:
+        for bwa in bwa_list:
+            obj = {
+                'id': bwa.id,
+                'airport_id': bwa.airport_id,
+                'flight_sche_id': bwa.flight_sche_id,
+                'time_stay': bwa.time_stay,
+                'note': bwa.note
+            }
+            airport_between_list.append(obj)
+    else:
         obj = {
-            'id': bwa.id,
-            'airport_id': get_airport_by_id(bwa.id),
-            'flight_sche_id': bwa.flight_sche_id,
-            'time_stay': bwa.time_stay,
-            'note': bwa.note
+            'id': '',
+            'airport_id': '',
+            'flight_sche_id': '',
+            'time_stay': '',
+            'note': ''
         }
-
         airport_between_list.append(obj)
     return airport_between_list
 
@@ -144,7 +159,7 @@ def get_flight_sche_json(id):
         'ticket2_quantity': fs.ticket2_quantity,
         'price_type_1':fs.price_type_1,
         'price_type_2': fs.price_type_2,
-        'between_list': len(bwl)
+        'between_list': bwl
     }
 
 def get_flight_sche_list():

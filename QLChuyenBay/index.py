@@ -5,6 +5,7 @@ import cloudinary.uploader
 from flask_login import login_user, logout_user, login_required
 from flask_mail import *
 import pdb
+
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from models import UserRole
@@ -170,7 +171,6 @@ def delete_route(route_id):
 @app.route('/api/flight-schedule', methods=['post'])
 def create_flight_schedule():
     data = request.json
-
     depart_airport= data.get('depart_airport')
     arrival_airport= data.get('arrival_airport')
     time_start= data.get('time_start')
@@ -205,6 +205,20 @@ def create_flight_schedule():
         'data': 'success'
     })
 
+@app.route('/api/flight-schedule/details-schedule', methods=['post'])
+def get_data_details_schedule():
+    data= request.json
+    details= dao.get_flight_sche_json(request.json.get('flight_schedule_id'))
+    if details:
+        return {
+            'data': 'success',
+            'status': 200
+        }
+    return {
+
+        'data': 'err',
+        'status': 500
+    }
 
 @login.user_loader
 def user_load(user_id):
@@ -215,7 +229,6 @@ def common_attributes():
     return {
         'user_role': UserRole
     }
-
 
 if __name__ == '__main__':
     from QLChuyenBay.admin import *

@@ -1,10 +1,10 @@
 from QLChuyenBay import app, db
 from flask_admin import Admin, expose, AdminIndexView
-from QLChuyenBay.models import UserRole, User, AirPort, FlightSchedule
+from QLChuyenBay.models import UserRole, User, AirPort, FlightSchedule, FlightRoute
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import BaseView
 from flask_login import current_user, logout_user
-from flask import redirect, render_template, abort
+from flask import redirect, render_template, abort, json, jsonify
 import dao
 
 class Authenticated(ModelView):
@@ -48,7 +48,7 @@ class FlightScheduleView(AuthenticatedStaff):
         route_list = dao.get_route_list()
         flight_sche_list= dao.get_flight_sche_list()
         return self.render('admin/flightSche.html',  list_airport= list_airport, route_list= route_list,
-                           rules= rules, flight_sche_list=flight_sche_list )
+                           rules= rules, flight_sche_list=flight_sche_list)
 
 class UserView(AuthenticatedAdmin):
     column_searchable_list = ['username', 'user_role']
@@ -78,6 +78,7 @@ class StatsView(AuthenticatedAdminView):
     @expose('/')
     def index(self):
         return self.render('admin/stats.html')
+
 
 admin= Admin(app=app, name='Quản lý chuyến bay', template_mode='bootstrap4', index_view= MyAdminIndex())
 admin.add_view(UserView(User, db.session, name='Người dùng'))

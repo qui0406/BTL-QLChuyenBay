@@ -38,6 +38,15 @@ function addBetweenAirport(max) {
     }
 }
 
+function validateDatetime(datetime) {
+    const now = new Date()
+    const now_date = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const check = datetime.getTime() - now_date.getTime()
+    if (check < 0)
+        return false
+    return true
+}
+
 function getData(){
 //    const checkTime= validateDateTime(new Date(start.value)) &&
 //         new Date(end.time).getTime() - new Date(start.value).getTime()
@@ -51,13 +60,20 @@ function getData(){
 //       }
 //    })
 //
-//    if (checkAirport) {
+//    return Swal.fire("Lỗi", "Vui lòng chọn lại chuyến bay phù hợp", "error");
+//    }
+//
+//    if (checkTime <= 0) {
+//       return Swal.fire("Lỗi", "Thời gian không hợp lệ", "error");
+//    }    if (checkAirport) {
 //       return Swal.fire("Lỗi", "Vui lòng chọn lại chuyến bay phù hợp", "error");
 //    }
 //
 //    if (checkTime <= 0) {
 //       return Swal.fire("Lỗi", "Thời gian không hợp lệ", "error");
 //    }
+
+
     const airportBetween= document.querySelectorAll('.airport-between')
     let airportBetweenList=[]
     let check= false
@@ -110,6 +126,37 @@ function getData(){
         .catch(error => {
             console.error(error);
         });
-
 }
 
+function btnDetails(flight_schedule_id){
+    fetch('/api/flight-schedule/details-schedule', {
+        method: 'post',
+        body: JSON.stringify({
+            "flight_schedule_id": flight_schedule_id
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+//        const box = document.getElementById('myBox');
+//        if (box.style.display === 'none') {
+//            box.style.display = 'block';
+//        } else {
+//            box.style.display = 'none';
+//        }
+    })
+    .catch(err => {
+          console.error("Error deleting route:", err);
+    });}
+
+
+//    function btnDetails(flight_schedule_id){
+//        const index= parseInt(flight_schedule_id) -1
+//        const html= `
+//
+//        `
+//
+//
+//    };

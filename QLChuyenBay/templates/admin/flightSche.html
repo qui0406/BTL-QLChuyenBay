@@ -86,9 +86,7 @@
         <th scope="col">Sân đến</th>
         <th scope="col">Thời gian đi</th>
         <th scope="col">Thời gian đến</th>
-        <th scope="col">Vé hạng 1</th>
-        <th scope="col">Vé hạng 2</th>
-        <th scope="col">Sân trung gian</th>
+        <th scope="col">Chi tiết chuyến bay</th>
     </tr>
     {% for f in flight_sche_list %}
     <tr>
@@ -97,23 +95,25 @@
         <th>{{f.arrival_airport}}</th>
         <th>{{f.time_start}}</th>
         <th>{{f.time_end}}</th>
-        <th>{{f.ticket1_quantity}}</th>
-        <th>{{f.ticket2_quantity}}</th>
-        <th>{{f.between_list}}</th>
+        <th>
+            <button  onclick="btnDetails({{f.id}})" class="btn btn-primary btn-details">Xem chi tiết</button>
+        </th>
     </tr>
     {%endfor%}
 </table>
 
 <script>
     function getIdDeparture(departureId) {
-    const arrivalDatalist = document.getElementById('list_arrival_sche');
-    arrivalDatalist.innerHTML = '';
-    {% for i in route_list %}
-       if ({{ i.departure_airport_id }} == departureId) {
-          arrivalDatalist.innerHTML += `<option value="{{ i.arrival_airport_id }}. {{ list_airport[i.arrival_airport_id - 1] }}"></option>`;
-       }
-    {% endfor %}
-}
+        const arrivalDatalist = document.getElementById('list_arrival_sche');
+        arrivalDatalist.innerHTML = '';
+        {% for i in route_list %}
+            if ({{ i.departure_airport_id }} == departureId) {
+                arrivalDatalist.innerHTML += `<option value="{{ i.arrival_airport_id }}. {{ list_airport[i.arrival_airport_id - 1] }}"></option>`;
+            }
+        {% endfor %}
+    };
+
+
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
