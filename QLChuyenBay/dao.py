@@ -1,8 +1,11 @@
+import datetime
 import json, os
 from QLChuyenBay import app, db
 from QLChuyenBay.models import User, UserRole, Rule, AirPort, FlightRoute, FlightSchedule, BetweenAirport
 import hashlib
 import re
+import locale
+locale.setlocale(locale.LC_ALL, 'vi_VN')
 
 def add_user(name, username, password, email, **kwarg):
     password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
@@ -55,7 +58,7 @@ def save_admin_rules(min_time_flight, max_quantity_between_airport, min_time_sta
 
 
 def get_air_port_list():
-    return AirPort.query.all()
+    return AirPort.query.filter().all()
 
 def add_route_flight(departure_airport_id, arrival_airport_id):
     if departure_airport_id and arrival_airport_id:
@@ -82,6 +85,7 @@ def create_flight_sche(depart_airport, arrival_airport, time_start, time_end,
     if route_flight_id:
         f = FlightSchedule(
             flight_route_id=route_flight_id.id,
+            i_act= True,
             time_start=time_start,
             time_end=time_end,
             ticket1_quantity=quantity_1st_ticket,
@@ -120,6 +124,9 @@ def get_route_json(fs):
             'arrival_airport': ''
         }
 
+def get_name_airport_by_id(id):
+    return AirPort.query.filter(AirPort.id.__eq__(id)).first().name
+
 def get_between_list(fs):
     bwa_list= BetweenAirport.query.filter(BetweenAirport.flight_sche_id.__eq__(fs.id)).all()
     airport_between_list = []
@@ -128,6 +135,7 @@ def get_between_list(fs):
             obj = {
                 'id': bwa.id,
                 'airport_id': bwa.airport_id,
+                'airport_name': get_name_airport_by_id(bwa.airport_id),
                 'flight_sche_id': bwa.flight_sche_id,
                 'time_stay': bwa.time_stay,
                 'note': bwa.note
@@ -157,9 +165,14 @@ def get_flight_sche_json(id):
         'time_end': fs.time_end,
         'ticket1_quantity': fs.ticket1_quantity,
         'ticket2_quantity': fs.ticket2_quantity,
-        'price_type_1':fs.price_type_1,
-        'price_type_2': fs.price_type_2,
-        'between_list': bwl
+        'ticket1_book_quantity': fs.ticket1_book_quantity,
+        'ticket2_book_quantity': fs.ticket2_book_quantity,
+        'price_type_1':locale.currency(fs.price_type_1, grouping=True),
+        'price_type_2': locale.currency(fs.price_type_2, grouping=True),
+        'between_list': {
+            'quantity': len(bwl),
+            'data': bwl
+        }
     }
 
 def get_flight_sche_list():
@@ -170,6 +183,48 @@ def get_flight_sche_list():
         flight_sche = get_flight_sche_json(f.id)
         flight_sche_list.append(flight_sche)
     return flight_sche_list
+
+def get_inp_search_json(departure_airport_id, departure_airport_name, arrival_airport_id,
+                        arrival_airport_name, time_start, ticket_type):
+    return {
+        "departure_airport_id": departure_airport_id,
+        "departure_airport_name": departure_airport_name,
+        "arrival_airport_id": arrival_airport_id,
+        "arrival_airport_name": arrival_airport_name,
+        "time_start": time_start,
+        "ticket_type": ticket_type
+    }
+
+def get_route_by_depart_and_arrival_id(departure_airport_id, arrival_airport_id):
+    return FlightRoute.query.filter(FlightRoute.departure_airport_id.__eq__(departure_airport_id),
+                                    FlightRoute.arrival_airport_id.__eq__(arrival_airport_id)).first()
+
+def search_flight_sche(departure_airport_id, arrival_airport_id, time_start, ticket_type):
+    time_array= time_start.split('-')
+    time= datetime.datetime(int(time_array[0]), int(time_array[1]), int(time_array[2]))
+    route= get_route_by_depart_and_arrival_id(departure_airport_id, arrival_airport_id)
+    flight_list= FlightSchedule.query.filter(FlightSchedule.i_act.__eq__(True), FlightSchedule.i_del.__eq__(False)).all()
+
+    flight_list_arr_tmp=[]
+    for fl in flight_list:
+        if fl.flight_route_id.__eq__(route.id) and fl.time_start.__gt__(time):
+            flight_list_arr_tmp.append(fl)
+
+    flight_list_arr=[]
+    if int(ticket_type)==1:
+        for fla in flight_list_arr_tmp:
+            if fla.ticket1_quantity.__gt__(fla.ticket1_book_quantity):
+                flight_list_arr.append(fla)
+    if int(ticket_type)==2:
+        for fla in flight_list_arr_tmp:
+            if fla.ticket2_quantity.__gt__(fla.ticket2_book_quantity):
+                flight_list_arr.append(fla)
+
+    flight_schedule_list=[]
+    for f in flight_list_arr:
+        f_sche= get_flight_sche_json(f.id)
+        flight_schedule_list.append(f_sche)
+    return flight_schedule_list
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)

@@ -16,7 +16,8 @@ from models import UserRole
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    airport_list = dao.get_air_port_list()
+    return render_template("index.html", airport_list= airport_list)
 
 @app.route('/verify', methods=["post", "get"])
 def user_verify():
@@ -208,6 +209,7 @@ def create_flight_schedule():
 @app.route('/api/flight-schedule/details-schedule', methods=['post'])
 def get_data_details_schedule():
     data= request.json
+
     details= dao.get_flight_sche_json(request.json.get('flight_schedule_id'))
     if details:
         return {
@@ -219,6 +221,46 @@ def get_data_details_schedule():
         'data': 'err',
         'status': 500
     }
+
+@app.route('/api/flight_schedule/search', methods=['post'])
+def search_flight_schedule():
+    data = request.json
+    departure_airport_id= data.get('departure_airport_id')
+    departure_airport_name= data.get('departure_airport_name').strip()
+    arrival_airport_id= data.get('arrival_airport_id')
+    arrival_airport_name= data.get('arrival_airport_name').strip()
+    time_start= data.get('time_start')
+    ticket_type= data.get('ticket_type')
+
+    try:
+        inp_search = dao.get_inp_search_json(departure_airport_id=departure_airport_id,
+                                             departure_airport_name=departure_airport_name,
+                                             arrival_airport_id=arrival_airport_id,
+                                             arrival_airport_name=arrival_airport_name,
+                                             time_start=time_start,
+                                             ticket_type=ticket_type)
+
+        data_search = dao.search_flight_sche(departure_airport_id= departure_airport_id,
+                                             arrival_airport_id= arrival_airport_id,
+                                             time_start=time_start,
+                                             ticket_type=ticket_type)
+
+        session['data_search'] = data_search
+        session['inp_search'] = inp_search
+
+    except Exception as error:
+        return {
+            'status': 500,
+            'data': error
+        }
+    return {
+        'status': 200,
+        'data': data_search
+    }
+
+@app.route('/flight_list')
+def flight_list():
+    return render_template('flightList.html')
 
 @login.user_loader
 def user_load(user_id):
