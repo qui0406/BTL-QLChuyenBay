@@ -1,7 +1,7 @@
 import datetime
 import json, os
 from QLChuyenBay import app, db
-from QLChuyenBay.models import User, UserRole, Rule, AirPort, FlightRoute, FlightSchedule, BetweenAirport
+from QLChuyenBay.models import User, UserRole, Rule, AirPort, FlightRoute, FlightSchedule, BetweenAirport, Ticket, Customer
 import hashlib
 import re
 import locale
@@ -206,6 +206,7 @@ def search_flight_sche(departure_airport_id, arrival_airport_id, time_start, tic
     flight_list= FlightSchedule.query.filter(FlightSchedule.i_act.__eq__(True), FlightSchedule.i_del.__eq__(False)).all()
 
     flight_list_arr_tmp=[]
+
     for fl in flight_list:
         if fl.flight_route_id.__eq__(route.id) and fl.time_start.__gt__(time):
             flight_list_arr_tmp.append(fl)
@@ -225,6 +226,67 @@ def search_flight_sche(departure_airport_id, arrival_airport_id, time_start, tic
         f_sche= get_flight_sche_json(f.id)
         flight_schedule_list.append(f_sche)
     return flight_schedule_list
+
+def get_quantity_ticket():
+    type_1= FlightSchedule.ticket1_quantity
+    type_2= FlightSchedule.ticket2_quantity
+    return type_1 + type_2
+
+def get_ticket_json(t_id):
+    t = Ticket.query.filter(Ticket.id.__eq__(t_id)).first()
+    c = Customer.query.filter(Customer.id.__eq__(t.id)).first()
+    return {
+        'id': t.id,
+        'author_id': t.author_id,
+        'flight_sche_id': get_flight_sche_json(t.flight_sche_id),
+        'ticket_price': t.ticket_price,
+        'ticket_type': t.ticket_type,
+        'ticket_package_price': t.ticket_package_price,
+        'customer_name': c.customer_name,
+        'customer_phone': c.customer_phone,
+        'customer_id': c.customer_id,
+        'created_at': t.created_at
+    }
+
+def get_ticket_list_json(user_id):
+    t_list = Ticket.query.filter(Ticket.author_id.__eq__(user_id)).order_by(Ticket.created_at.desc()).all()
+    t_list_json = []
+    for t in t_list:
+        t_list_json.append(get_ticket_json(t.id))
+    return t_list_json
+
+
+# def get_ticket_remain(ticket_id, ticket_type):
+#     f= FlightSchedule.query.filter(FlightSchedule.i_act.__eq__(True), FlightSchedule.i_del.__eq__(False),
+#                                    FlightSchedule.id.__eq__(ticket_id)).first()
+#     remain=0
+#     if int(ticket_type)==1:
+#         remain= f.ticket1_quantity- f.ticket1_book_quantity
+#     if int(ticket_type)==2:
+#         remain = f.ticket2_quantity - f.ticket2_book_quantity
+#     return remain
+#
+# def get_admin_rules_latest():
+#     ar = Rule.query.order_by(Rule.created_at.desc()).first()
+#     return ar
+#
+# def check_time_ticket(f_id, is_user= True):
+#     f = FlightSchedule.query.filter(FlightSchedule.is_active.__eq__(True), FlightSchedule.is_deleted.__eq__(False),
+#                                     FlightSchedule.id.__eq__(f_id)).first()
+#     ar = get_admin_rules_latest()
+#     f_ts = f.time_start.timestamp()
+#     n_ts = datetime.datetime.now().timestamp()
+#     if is_user:
+#         return {
+#             'min': ar.time_book_ticket,
+#             'state': (f_ts - n_ts) / 3600 > ar.time_book_ticket
+#         }
+#     return {
+#         'min': ar.time_buy_ticket,
+#         'state': (f_ts - n_ts) / 3600 > ar.time_buy_ticket
+#     }
+
+
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)

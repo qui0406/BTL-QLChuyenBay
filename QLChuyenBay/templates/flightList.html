@@ -50,21 +50,20 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex">
-            <div style="margin: 5px;">
-                <div id="type-1" class="mb-2">
-                    Chỉ từ {{ d.price_type_1 }}/ khách
-                    <a href="/form_ticket/{{ d.id }}" class="btn w-100 btn-success">Chọn</a>
+        <form method="POST" action="javascript:;">
+            <div class="d-flex">
+                <div style="margin: 5px;">
+                    <div id="type-1" class="mb-2" onclick="selectTicketType(1, {{d.id}})">
+                        <a href="/ticket/{{ d.id }}"  class="btn w-100 btn-success">Vé hạng 1 chỉ từ {{ d.price_type_1 }}/ khách</a>
+                    </div>
+                </div>
+                <div style="margin: 5px;">
+                    <div id="type-2" class="mb-2" onclick="selectTicketType(2, {{d.id}})">
+                        <a href="/ticket/{{ d.id }}"  class="btn w-100 btn-success">Vé hạng 2 chỉ từ {{ d.price_type_2 }}/ khách</a>
+                    </div>
                 </div>
             </div>
-
-            <div style="margin: 5px;">
-                <div id="type-2" class="mb-2">
-                    Chỉ từ {{ d.price_type_2 }}/ khách
-                    <a href="/form_ticket/{{ d.id }}" class="btn w-100 btn-success">Chọn</a>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
     <div class="">
         <span role="button" class="ps-3 fst-italic" data-bs-toggle="collapse" data-bs-target="#collapseExample-{{d.id}}"
@@ -89,6 +88,7 @@
 </div>
 {% endfor %}
 {% endif %}
+<script src="{{url_for('static', filename='js/flightList.js')}}"></script>
 
 
 {% endblock %}
