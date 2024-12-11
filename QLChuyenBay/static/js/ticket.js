@@ -4,7 +4,21 @@ const subBtn = document.querySelector('#sub-customer')
 const price = document.querySelector('.price span')
 const select = document.querySelector('form select')
 
-packagePrice = 0;
+let packagePrice = 0;
+
+select.onchange = (e) => {
+    updatePrice(-packagePrice)
+    if (e.target.value == 0) {
+        packagePrice = 0
+    }
+    if (e.target.value == 12) {
+        packagePrice = 320000
+    }
+    if (e.target.value == 20) {
+        packagePrice = 400000
+    }
+    updatePrice(packagePrice)
+}
 
 function updatePrice(value) {
     const data = price.innerHTML.split(",")
@@ -12,7 +26,7 @@ function updatePrice(value) {
     data.forEach(d => {
         total += d
     })
-    price.innerHTML = new Intl.NumberFormat().format(parseInt(total) + parseInt(value))
+    price.innerHTML = `${Intl.NumberFormat().format(parseInt(total) + parseInt(value))} VNĐ`
 }
 
 addBtn.onclick=()=>{
@@ -41,8 +55,6 @@ addBtn.onclick=()=>{
         updatePrice(parseInt(price.dataset.price))
     }
 }
-
-
 subBtn.onclick = () => {
     const listCustomer = document.querySelectorAll(".customer-info")
     const current = listCustomer.length
@@ -52,44 +64,29 @@ subBtn.onclick = () => {
     }
 }
 
-select.onchange = (e) => {
-    updatePrice(-packagePrice)
-    if (e.target.value == 0) {
-        packagePrice = 0
-    }
-    if (e.target.value == 12) {
-        packagePrice = 320000
-    }
-    if (e.target.value == 20) {
-        packagePrice = 400000
-    }
-    updatePrice(packagePrice)
-}
-
 btnSeat.onclick=()=>{
     event.preventDefault()
+
+    const inputList = document.querySelectorAll('form input[required]')
+    const inpValidateErr = Array.from(inputList).find(inp => inp.value.length < inp.getAttribute('minlength'))
+    const inpErr = Array.from(inputList).find(inp => !inp.value)
+    if (inpErr) {
+        inpErr.focus()
+        return Swal.fire("Lỗi", "Vui lòng nhập đủ thông tin!", "error")
+    }
+    if (inpValidateErr) {
+        inpValidateErr.focus()
+        return Swal.fire("Lỗi", `Vui lòng nhập ít nhất ${inpValidateErr.getAttribute('minlength')} kí tự!`, "error")
+    }
+    function findInp(name) {
+        return Array.from(inputList).find(inp => inp.classList.contains(name))
+    }
     window.location.href='/choose-seat'
 }
 
-//    const inputList = document.querySelectorAll('form input[required]')
-//    const inpErr = Array.from(inputList).find(inp => !inp.value)
-////    if (inpErr) {
-////        inpErr.focus()
-////        return alert('loi')
-////        //return Swal.fire("Lỗi", "Vui lòng nhập đủ thông tin!", "error")
-////    }
+
 ////
-////    const inpValidateErr = Array.from(inputList).find(inp => inp.value.length < inp.getAttribute('minlength'))
-////
-////    if (inpValidateErr) {
-////        inpValidateErr.focus()
-////        return alert('loi')
-////      //  return Swal.fire("Lỗi", `Vui lòng nhập ít nhất ${inpValidateErr.getAttribute('minlength')} kí tự!`, "error")
-////    }
-////
-////    function findInp(name) {
-////        return Array.from(inputList).find(inp => inp.classList.contains(name))
-////    }
+
 //
 //    const customerInfo = []
 //    const quantityCustomner = (inputList.length - 2) / 3

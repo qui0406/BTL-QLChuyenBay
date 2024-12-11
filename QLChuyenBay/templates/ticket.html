@@ -66,8 +66,8 @@
                     <label for="package" class="fw-bold form-label">Hành lý thêm (kg): </label>
                     <select id="package" class="form-select">
                         <option selected value="0">0</option>
-                        <option value="8">12</option>
-                        <option value="12">20</option>
+                        <option value="12">12</option>
+                        <option value="20">20</option>
                     </select>
                 </div>
             </div>
@@ -109,17 +109,17 @@
             <div>
                 Giá phải trả:
             </div>
-            <div style="color: rgb(255, 94, 31);" class="price fw-bold fs-4">{%if f.price_type_1!=0%}
-                <span data-price="{{ f.price_type_1 }}">{{ f.price_type_1 }}</span>
-                {%else%}
-                <span data-price="{{ f.price_type_2 }}">{{ f.price_type_2 }}</span>
+            <div style="color: rgb(255, 94, 31);" class="price fw-bold fs-4">{%if ticket_type=='1'%}
+                <span data-price="{{ f.price_type_1 }}">{{ f.price_type_1 }} VNĐ</span>
+                {%elif ticket_type=='2'%}
+                <span data-price="{{ f.price_type_2 }}">{{ f.price_type_2 }} VNĐ</span>
                 {%endif%}
             </div>
         </div>
     </div>
 </div>
 {% block js %}
-<script defer src="{{ url_for('static', filename='js/ticket.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script defer src="{{ url_for('static', filename='js/ticket.js') }}"></script>
 {% endblock %}
 {% endblock %}

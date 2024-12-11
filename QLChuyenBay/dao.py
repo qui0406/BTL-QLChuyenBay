@@ -167,8 +167,8 @@ def get_flight_sche_json(id):
         'ticket2_quantity': fs.ticket2_quantity,
         'ticket1_book_quantity': fs.ticket1_book_quantity,
         'ticket2_book_quantity': fs.ticket2_book_quantity,
-        'price_type_1':locale.currency(fs.price_type_1, grouping=True),
-        'price_type_2': locale.currency(fs.price_type_2, grouping=True),
+        'price_type_1': "{:,.0f}".format(fs.price_type_1),
+        'price_type_2': "{:,.0f}".format(fs.price_type_2),
         'between_list': {
             'quantity': len(bwl),
             'data': bwl

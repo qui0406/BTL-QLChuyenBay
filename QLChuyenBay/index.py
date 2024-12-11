@@ -259,7 +259,7 @@ def search_flight_schedule():
         'data': data_search
     }
 
-@app.route('/flight_list')
+@app.route('/flight-list')
 def flight_list():
     return render_template('flightList.html')
 
@@ -269,10 +269,9 @@ def choose_seat():
 
 @app.route('/ticket/<int:flight_id>')
 def get_ticket(flight_id):
-    # data= request.get_json()
-    # ticket_type = data.get('ticketType')
+    ticket_type= request.args.get('ticket-type')
     f = dao.get_flight_sche_json(flight_id)
-    return render_template('ticket.html', f=f, user_role=UserRole)
+    return render_template('ticket.html',ticket_type=ticket_type, f=f, user_role=UserRole)
 
 @app.route('/api/momo_ipn', methods=['post'])
 def momo_ipn():

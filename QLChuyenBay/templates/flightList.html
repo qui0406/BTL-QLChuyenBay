@@ -50,16 +50,16 @@
                 </div>
             </div>
         </div>
-        <form method="POST" action="javascript:;">
+        <form action="javascript:;">
             <div class="d-flex">
                 <div style="margin: 5px;">
-                    <div id="type-1" class="mb-2" onclick="selectTicketType(1, {{d.id}})">
-                        <a href="/ticket/{{ d.id }}"  class="btn w-100 btn-success">Vé hạng 1 chỉ từ {{ d.price_type_1 }}/ khách</a>
+                    <div id="type-1" class="mb-2" onclick="selectTicketType1(1, {{d.id}})">
+                        <a href="#"  class="btn w-100 btn-success">Vé hạng 1 chỉ từ {{ d.price_type_1 }}/ khách</a>
                     </div>
                 </div>
                 <div style="margin: 5px;">
-                    <div id="type-2" class="mb-2" onclick="selectTicketType(2, {{d.id}})">
-                        <a href="/ticket/{{ d.id }}"  class="btn w-100 btn-success">Vé hạng 2 chỉ từ {{ d.price_type_2 }}/ khách</a>
+                    <div id="type-2" class="mb-2" onclick="selectTicketType2(2, {{d.id}})">
+                        <a href="#"  class="btn w-100 btn-success">Vé hạng 2 chỉ từ {{ d.price_type_2 }}/ khách</a>
                     </div>
                 </div>
             </div>

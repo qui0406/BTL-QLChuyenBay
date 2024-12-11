@@ -20,7 +20,7 @@ function searchFlight(){
     })
     .then(res=>res.json())
     .then(data=>{
-         window.location.href = '/flight_list'
+         window.location.href = '/flight-list'
     }).catch(err=>{
         console.error(err)
     })
