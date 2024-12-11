@@ -269,11 +269,9 @@ def choose_seat():
 
 @app.route('/ticket/<int:flight_id>')
 def get_ticket(flight_id):
-
     # data= request.get_json()
     # ticket_type = data.get('ticketType')
     f = dao.get_flight_sche_json(flight_id)
-
     return render_template('ticket.html', f=f, user_role=UserRole)
 
 @app.route('/api/momo_ipn', methods=['post'])
@@ -285,38 +283,39 @@ def bill_ticket(user_id):
     ticket_list_json=dao.get_ticket_list_json(user_id= user_id)
     return render_template('billTicket.html', ticket_list_json= ticket_list_json)
 
-# @app.route('/api/create_ticket/<int:f_id>', methods=['post'])
-# def create_ticket():
-#     data= request.json
-#     id = data.get('id')
-#     type_ticket= data.get('type_ticket')
-#
-#     session['ticket']= data
-#     remain_ticket=dao.get_ticket_remain(id, type_ticket)
-#     if remain_ticket < data['customers_info'][0]['quantity']:
-#         return {
-#             'status': 500,
-#             'data': "Chỉ có thể đặt tối đa %s vé!" % remain_ticket
-#         }
-#     if data['user_role'] == 'UserRole.STAFF' or data['user_role'] == 'UserRole.ADMIN':
-#         check_time = dao.check_time_ticket(id, is_user=False)
-#         if not check_time['state']:
-#             return {
-#                 'status': 500,
-#                 'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
-#             }
-#         # pay_ticket(data['f_id'], is_staff=True)
-#     else:
-#         check_time = dao.check_time_ticket(id)
-#         if not check_time['state']:
-#             return {
-#                 'status': 500,
-#                 'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
-#             }
-#     return {
-#         'status': 200,
-#         'data': data['f_id']
-#     }
+@app.route('/api/create_ticket/<int:f_id>', methods=['post'])
+def create_ticket():
+    data= request.json
+    id = data.get('id')
+    type_ticket= data.get('type_ticket')
+
+    session['ticket']= data
+    remain_ticket=dao.get_ticket_remain(id, type_ticket)
+    if remain_ticket < data['customers_info'][0]['quantity']:
+        return {
+            'status': 500,
+            'data': "Chỉ có thể đặt tối đa %s vé!" % remain_ticket
+        }
+    if data['user_role'] == 'UserRole.STAFF' or data['user_role'] == 'UserRole.ADMIN':
+        check_time = dao.check_time_ticket(id, is_user=False)
+        if not check_time['state']:
+            return {
+                'status': 500,
+                'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
+            }
+        # pay_ticket(data['f_id'], is_staff=True)
+    else:
+        check_time = dao.check_time_ticket(id)
+        if not check_time['state']:
+            return {
+                'status': 500,
+                'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
+            }
+    return {
+        'status': 200,
+        'data': data['f_id']
+    }
+
 
 @login.user_loader
 def user_load(user_id):

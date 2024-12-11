@@ -73,7 +73,8 @@
             </div>
         </div>
         <div >
-            <button id="choose_seat" class="btn btn-success mx-2 w-100">
+            <button data-user="{{ current_user.user_role }}" data-userId="{{ current_user.get_id() }}"
+                     id="choose_seat" class="btn btn-success mx-2 w-100">
                 Chọn ghế
             </button>
         </div>
