@@ -1,5 +1,4 @@
 const btnSubmit= document.querySelector('.btn-submit')
-
 const inp_da= document.getElementById('departure')
 const inp_aa= document.getElementById('arrival')
 
@@ -22,7 +21,6 @@ function addRoute(){
               showConfirmButton: false,
               timer: 1500});
         location.reload()
-
     }).catch(err=>{
         console.error(err)
     })

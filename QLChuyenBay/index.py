@@ -8,6 +8,7 @@ import pdb
 
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
+#from QLChuyenBay.dao import remain_ticket
 from models import UserRole
 
 # @app.errorhandler(404)
@@ -16,7 +17,8 @@ from models import UserRole
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    airport_list = dao.get_air_port_list()
+    return render_template("index.html", airport_list= airport_list)
 
 @app.route('/verify', methods=["post", "get"])
 def user_verify():
@@ -208,6 +210,7 @@ def create_flight_schedule():
 @app.route('/api/flight-schedule/details-schedule', methods=['post'])
 def get_data_details_schedule():
     data= request.json
+
     details= dao.get_flight_sche_json(request.json.get('flight_schedule_id'))
     if details:
         return {
@@ -219,6 +222,101 @@ def get_data_details_schedule():
         'data': 'err',
         'status': 500
     }
+
+@app.route('/api/flight_schedule/search', methods=['post'])
+def search_flight_schedule():
+    data = request.json
+    departure_airport_id= data.get('departure_airport_id')
+    departure_airport_name= data.get('departure_airport_name').strip()
+    arrival_airport_id= data.get('arrival_airport_id')
+    arrival_airport_name= data.get('arrival_airport_name').strip()
+    time_start= data.get('time_start')
+    ticket_type= data.get('ticket_type')
+
+    try:
+        inp_search = dao.get_inp_search_json(departure_airport_id=departure_airport_id,
+                                             departure_airport_name=departure_airport_name,
+                                             arrival_airport_id=arrival_airport_id,
+                                             arrival_airport_name=arrival_airport_name,
+                                             time_start=time_start,
+                                             ticket_type=ticket_type)
+
+        data_search = dao.search_flight_sche(departure_airport_id= departure_airport_id,
+                                             arrival_airport_id= arrival_airport_id,
+                                             time_start=time_start,
+                                             ticket_type=ticket_type)
+
+        session['data_search'] = data_search
+        session['inp_search'] = inp_search
+
+    except Exception as error:
+        return {
+            'status': 500,
+            'data': error
+        }
+    return {
+        'status': 200,
+        'data': data_search
+    }
+
+@app.route('/flight_list')
+def flight_list():
+    return render_template('flightList.html')
+
+@app.route('/choose-seat')
+def choose_seat():
+    return render_template('seat.html')
+
+@app.route('/ticket/<int:flight_id>')
+def get_ticket(flight_id):
+
+    # data= request.get_json()
+    # ticket_type = data.get('ticketType')
+    f = dao.get_flight_sche_json(flight_id)
+
+    return render_template('ticket.html', f=f, user_role=UserRole)
+
+@app.route('/api/momo_ipn', methods=['post'])
+def momo_ipn():
+    pass
+
+@app.route('/bill_ticket/<int:user_id>')
+def bill_ticket(user_id):
+    ticket_list_json=dao.get_ticket_list_json(user_id= user_id)
+    return render_template('billTicket.html', ticket_list_json= ticket_list_json)
+
+# @app.route('/api/create_ticket/<int:f_id>', methods=['post'])
+# def create_ticket():
+#     data= request.json
+#     id = data.get('id')
+#     type_ticket= data.get('type_ticket')
+#
+#     session['ticket']= data
+#     remain_ticket=dao.get_ticket_remain(id, type_ticket)
+#     if remain_ticket < data['customers_info'][0]['quantity']:
+#         return {
+#             'status': 500,
+#             'data': "Chỉ có thể đặt tối đa %s vé!" % remain_ticket
+#         }
+#     if data['user_role'] == 'UserRole.STAFF' or data['user_role'] == 'UserRole.ADMIN':
+#         check_time = dao.check_time_ticket(id, is_user=False)
+#         if not check_time['state']:
+#             return {
+#                 'status': 500,
+#                 'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
+#             }
+#         # pay_ticket(data['f_id'], is_staff=True)
+#     else:
+#         check_time = dao.check_time_ticket(id)
+#         if not check_time['state']:
+#             return {
+#                 'status': 500,
+#                 'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
+#             }
+#     return {
+#         'status': 200,
+#         'data': data['f_id']
+#     }
 
 @login.user_loader
 def user_load(user_id):

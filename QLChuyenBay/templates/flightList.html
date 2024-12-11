@@ -1,0 +1,94 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="bg-light d-flex w-100 justify-content-between p-2 rounded-3 shadow-sm mt-4 align-items-center">
+    <div>
+        <div>
+            {{ session['inp_search'].departure_airport_name }} → {{ session['inp_search'].arrival_airport_name}}
+        </div>
+        <div>
+            {{ session['inp_search'].time_start}} | 1 hành khách | Vé hạng {{ session['inp_search'].ticket_type }}
+        </div>
+    </div>
+    <a href="/" class="btn btn-primary">
+        Đổi tìm kiếm
+    </a>
+</div>
+
+{% if not session['data_search'] %}
+<h3 class="text-danger text-center mt-4">Không có chuyến bay nào phù hợp!</h3>
+{% else %}
+<h3 class="text-center text-uppercase my-4">Danh sách chuyến bay phù hợp</h3>
+{% for d in session['data_search'] %}
+<div class="bg-light p-2 shadow-sm rounded-3 mt-3">
+    <div class="px-3 d-flex justify-content-between align-items-center">
+        <div>
+            <div class="d-flex gap-5 justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-center">
+                        {{ d.time_start.day }}/{{ d.time_start.month }}/{{d.time_start.year}} {{ d.time_start.hour }}:{{ d.time_start.minute
+                        }}
+                        <br>
+                        {{ d.departure_airport_name }}
+                    </div>
+                    <div class="mx-3"> →</div>
+                    <div class="text-center">
+                        {{ d.time_end.day }}/{{ d.time_end.month }}/ {{d.time_end.year}} {{ d.time_end.hour }}:{{ d.time_end.minute }}
+                        <br>
+                        {{ d.arrival_airport_name }}
+                    </div>
+                </div>
+                <div>
+                     <div>Trạm dừng:
+                         {%if d.between_list.quantity%}
+                            {{ d.between_list.quantity }}
+                        {%else%}
+                            0
+                        {%endif%}
+                     </div>
+                    <div>Ước tính: {{ d.time_end- d.time_start }}</div>
+                </div>
+            </div>
+        </div>
+        <form method="POST" action="javascript:;">
+            <div class="d-flex">
+                <div style="margin: 5px;">
+                    <div id="type-1" class="mb-2" onclick="selectTicketType(1, {{d.id}})">
+                        <a href="/ticket/{{ d.id }}"  class="btn w-100 btn-success">Vé hạng 1 chỉ từ {{ d.price_type_1 }}/ khách</a>
+                    </div>
+                </div>
+                <div style="margin: 5px;">
+                    <div id="type-2" class="mb-2" onclick="selectTicketType(2, {{d.id}})">
+                        <a href="/ticket/{{ d.id }}"  class="btn w-100 btn-success">Vé hạng 2 chỉ từ {{ d.price_type_2 }}/ khách</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="">
+        <span role="button" class="ps-3 fst-italic" data-bs-toggle="collapse" data-bs-target="#collapseExample-{{d.id}}"
+              aria-expanded="false" aria-controls="collapseExample">
+            Chi tiết chuyến bay
+        </span>
+        <div class="collapse" id="collapseExample-{{d.id}}">
+            <div class="card card-body">
+                {% for abw in d.between_list.data %}
+                <div> - Sân bay trung gian {{ abw.airport_name }} (dừng {{ abw.time_stay }} giờ)</div>
+                {% endfor %}
+                <div> ● Vé hạng 1: {%if d.ticket1_book_quantity %}
+                    {{ d.ticket1_book_quantity }}
+                    {%else%} 0 {%endif%}
+                    /{{ d.ticket1_quantity }}</div>
+                <div> ● Vé hạng 2:  {%if d.ticket2_book_quantity %}
+                    {{ d.ticket2_book_quantity }}
+                    {%else%} 0 {%endif%}/{{ d.ticket2_quantity }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+<script src="{{url_for('static', filename='js/flightList.js')}}"></script>
+
+
+{% endblock %}

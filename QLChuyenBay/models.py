@@ -95,30 +95,36 @@ class BetweenAirport(BaseModel):
     note= Column(String(100))
     is_deleted = Column(Boolean, default=False)
 
-# class Ticket(BaseModel):
-#     __table_args__ = {'extend_existing': True}
-#     ticket_price = Column(Integer, nullable= False)
-#     ticket_type= Column(Integer, nullable= False)
-#     ticket_package_price= Column(Integer, default=0)
-#     created_at= Column(DateTime, default= datetime.now())
-#
-# class Customer(BaseModel):
-#     __table_args__ = {'extend_existing': True}
-#     customer_name= Column(String(100), nullable= False)
-#     customer_email= Column(String(50))
-#     customer_phone= Column(String(12), nullable= False)
-#
-#     def __str__(self):
-#         return self.name
+class Customer(BaseModel):
+    __table_args__ = {'extend_existing': True}
+    customer_name= Column(String(100), nullable= False)
+    customer_email= Column(String(50))
+    customer_phone= Column(String(12), nullable= False)
+
+    def __str__(self):
+        return self.name
 
 
+class Ticket(BaseModel):
+    __table_args__ = {'extend_existing': True}
+    author_id = Column(Integer, ForeignKey(User.id), nullable=True)
+    customer_id = Column(Integer, ForeignKey(Customer.id))
+    flight_sche_id = Column(Integer, ForeignKey(FlightSchedule.id), nullable=True)
+    ticket_price = Column(Integer, nullable= False)
+    ticket_type= Column(Integer, nullable= False)
+    ticket_package_price= Column(Integer, default=0)
+    created_at= Column(DateTime, default= datetime.now())
+    # seat_id= relationship('Seat', backref='ticket', lazy=True)
 
+class Seat(BaseModel):
+    __table_args__= {'extend_existing': True}
+    seat_number= Column(Integer, nullable=False, unique= True)
+    ticket_id= Column(Integer, ForeignKey(Ticket.id), nullable= False)
+    is_active= Column(Boolean, default= False)
 
-
-
-# @login.user_loader
-# def user_load(user_id):
-#     return dao.get_user_by_id(user_id=user_id)
+@login.user_loader
+def user_load(user_id):
+    return dao.get_user_by_id(user_id=user_id)
 
 if __name__=="__main__":
     with app.app_context():
