@@ -4,11 +4,6 @@ const subBtn = document.querySelector('#sub-customer')
 const price = document.querySelector('.price span')
 const select = document.querySelector('form select')
 
-//btnSeat.onclick=()=>{
-//    event.preventDefault()
-//    window.location.href='/choose-seat'
-//}
-
 packagePrice = 0;
 
 function updatePrice(value) {
@@ -47,6 +42,7 @@ addBtn.onclick=()=>{
     }
 }
 
+
 subBtn.onclick = () => {
     const listCustomer = document.querySelectorAll(".customer-info")
     const current = listCustomer.length
@@ -70,41 +66,98 @@ select.onchange = (e) => {
     updatePrice(packagePrice)
 }
 
-btnSeat.onclick=(e)=>{
-    e.preventDefault()
-
-    const inputList = document.querySelectorAll('form input[required]')
-    const inpErr = Array.from(inputList).find(inp => !inp.value)
-//    if (inpErr) {
-//        inpErr.focus()
-//        return alert('loi')
-//        //return Swal.fire("Lỗi", "Vui lòng nhập đủ thông tin!", "error")
-//    }
-//
-//    const inpValidateErr = Array.from(inputList).find(inp => inp.value.length < inp.getAttribute('minlength'))
-//
-//    if (inpValidateErr) {
-//        inpValidateErr.focus()
-//        return alert('loi')
-//      //  return Swal.fire("Lỗi", `Vui lòng nhập ít nhất ${inpValidateErr.getAttribute('minlength')} kí tự!`, "error")
-//    }
-//
-//    function findInp(name) {
-//        return Array.from(inputList).find(inp => inp.classList.contains(name))
-//    }
-
-    const customerInfo = []
-    const quantityCustomner = (inputList.length - 2) / 3
-    Array.from(inputList).forEach((inp, index) => {
-        if (index == 2 || index == 5 || index == 8) {
-            const obj = {
-                id: index,
-                name: inp.value,
-                phone: inputList[index + 1].value,
-                id_customer: inputList[index + 2].value
-            }
-            customerInfo.push(obj)
-        }
-    })
+btnSeat.onclick=()=>{
+    event.preventDefault()
     window.location.href='/choose-seat'
 }
+
+//    const inputList = document.querySelectorAll('form input[required]')
+//    const inpErr = Array.from(inputList).find(inp => !inp.value)
+////    if (inpErr) {
+////        inpErr.focus()
+////        return alert('loi')
+////        //return Swal.fire("Lỗi", "Vui lòng nhập đủ thông tin!", "error")
+////    }
+////
+////    const inpValidateErr = Array.from(inputList).find(inp => inp.value.length < inp.getAttribute('minlength'))
+////
+////    if (inpValidateErr) {
+////        inpValidateErr.focus()
+////        return alert('loi')
+////      //  return Swal.fire("Lỗi", `Vui lòng nhập ít nhất ${inpValidateErr.getAttribute('minlength')} kí tự!`, "error")
+////    }
+////
+////    function findInp(name) {
+////        return Array.from(inputList).find(inp => inp.classList.contains(name))
+////    }
+//
+//    const customerInfo = []
+//    const quantityCustomner = (inputList.length - 2) / 3
+//    Array.from(inputList).forEach((inp, index) => {
+//        if (index == 2 || index == 5 || index == 8) {
+//            const obj = {
+//                id: index,
+//                name: inp.value,
+//                phone: inputList[index + 1].value,
+//                id_customer: inputList[index + 2].value
+//            }
+//            customerInfo.push(obj)
+//        }
+//    })
+//
+//    const pathNames = window.location.pathname
+//    const fId = pathNames[pathNames.length - 1]
+//
+//    const data = {
+//        contact_info: {
+//            name: findInp('name').value,
+//            phone: findInp('phone').value
+//        },
+//        customers_info: [
+//            {
+//                quantity: customerInfo.length,
+//                data: customerInfo
+//            }
+//        ],
+//        package_price: packagePrice,
+//        f_id: fId,
+//        ticket_type: document.querySelector('span.ticket-type').innerHTML,
+//        total: price.innerHTML,
+//        user_role: submitBtn.dataset.user
+//    }
+//    fetch(`/api/ticket/${fId}`, {
+//        method: 'post',
+//        body: JSON.stringify(data),
+//        headers: {
+//            "Content-Type": "application/json"
+//        }
+//    })
+//    .then(res => res.json())
+//    .then(data => {
+//        if (data.status == 200 && (submitBtn.dataset.user == 'UserRole.STAFF' || submitBtn.dataset.user == 'UserRole.ADMIN')) {
+//            const inputList = document.querySelectorAll('form input')
+//            Array.from(inputList).forEach(inp => inp.value=null)
+//            select.value=0
+//            price.innerHTML = new Intl.NumberFormat().format(parseInt(price.dataset.price))
+////            return Swal.fire({
+////              title: 'Đặt vé thành công. Bạn có muốn đến trang xem vé?',
+////              showDenyButton: true,
+////              confirmButtonText: 'Có',
+////              denyButtonText: "Tiếp tục đặt vé",
+////            }).then((result) => {
+////              if (result.isConfirmed) {
+////              }
+////            })
+//
+//        }
+//        if (data.status == 200) {
+//            window.location.href = "/pay/" + data.data
+//        }
+//        if (data.status == 500) {
+//            Swal.fire("Lỗi", data.data, "error")
+//        }
+//    })
+//    .catch(err => {
+//        Swal.fire("Lỗi", err.data, "error")
+//    })
+//}

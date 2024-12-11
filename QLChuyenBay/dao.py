@@ -256,35 +256,35 @@ def get_ticket_list_json(user_id):
     return t_list_json
 
 
-# def get_ticket_remain(ticket_id, ticket_type):
-#     f= FlightSchedule.query.filter(FlightSchedule.i_act.__eq__(True), FlightSchedule.i_del.__eq__(False),
-#                                    FlightSchedule.id.__eq__(ticket_id)).first()
-#     remain=0
-#     if int(ticket_type)==1:
-#         remain= f.ticket1_quantity- f.ticket1_book_quantity
-#     if int(ticket_type)==2:
-#         remain = f.ticket2_quantity - f.ticket2_book_quantity
-#     return remain
-#
-# def get_admin_rules_latest():
-#     ar = Rule.query.order_by(Rule.created_at.desc()).first()
-#     return ar
-#
-# def check_time_ticket(f_id, is_user= True):
-#     f = FlightSchedule.query.filter(FlightSchedule.is_active.__eq__(True), FlightSchedule.is_deleted.__eq__(False),
-#                                     FlightSchedule.id.__eq__(f_id)).first()
-#     ar = get_admin_rules_latest()
-#     f_ts = f.time_start.timestamp()
-#     n_ts = datetime.datetime.now().timestamp()
-#     if is_user:
-#         return {
-#             'min': ar.time_book_ticket,
-#             'state': (f_ts - n_ts) / 3600 > ar.time_book_ticket
-#         }
-#     return {
-#         'min': ar.time_buy_ticket,
-#         'state': (f_ts - n_ts) / 3600 > ar.time_buy_ticket
-#     }
+def get_ticket_remain(ticket_id, ticket_type):
+    f= FlightSchedule.query.filter(FlightSchedule.i_act.__eq__(True), FlightSchedule.i_del.__eq__(False),
+                                   FlightSchedule.id.__eq__(ticket_id)).first()
+    remain=0
+    if int(ticket_type)==1:
+        remain= f.ticket1_quantity- f.ticket1_book_quantity
+    if int(ticket_type)==2:
+        remain = f.ticket2_quantity - f.ticket2_book_quantity
+    return remain
+
+def get_admin_rules_latest():
+    ar = Rule.query.order_by(Rule.created_at.desc()).first()
+    return ar
+
+def check_time_ticket(f_id, is_user= True):
+    f = FlightSchedule.query.filter(FlightSchedule.is_active.__eq__(True), FlightSchedule.is_deleted.__eq__(False),
+                                    FlightSchedule.id.__eq__(f_id)).first()
+    ar = get_admin_rules_latest()
+    f_ts = f.time_start.timestamp()
+    n_ts = datetime.datetime.now().timestamp()
+    if is_user:
+        return {
+            'min': ar.time_book_ticket,
+            'state': (f_ts - n_ts) / 3600 > ar.time_book_ticket
+        }
+    return {
+        'min': ar.time_buy_ticket,
+        'state': (f_ts - n_ts) / 3600 > ar.time_buy_ticket
+    }
 
 
 
