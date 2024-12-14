@@ -6,6 +6,9 @@ import cloudinary
 from flask_login import LoginManager
 from flask_mail import *
 from flask_principal import Principal
+import stripe
+
+
 
 
 app = Flask(__name__)
@@ -19,11 +22,15 @@ app.config["MAIL_USERNAME"]='anhqui04062004@gmail.com'
 app.config["MAIL_PASSWORD"]='hsesebwdzpkqnzna'
 app.config["MAIL_USE_TLS"]= True
 
+app.config['MY_DOMAIN']= 'http://localhost:5002'
+
 cloudinary.config(
     cloud_name= 'do43r8nr0',
     api_key='947875495844325',
     api_secret= 'evQEPk5TbxIMpCWbbXl8sLMbo6A'
 )
+
+stripe.api_key= 'sk_test_51QVbF6GdmuuxpPW1WKDGv0LbqFP9D7ilJcLKa2jLf5tE0r6TkWteM0GTeLTsGjHU3oaB3tHFNbydVhhdOyZmFdaX00BJJPujHJ'
 
 otp= randint(000000, 999999)
 mail=Mail(app=app)

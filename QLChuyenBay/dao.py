@@ -1,7 +1,7 @@
 import datetime
 import json, os
 from QLChuyenBay import app, db
-from QLChuyenBay.models import User, UserRole, Rule, AirPort, FlightRoute, FlightSchedule, BetweenAirport, Ticket, Customer
+from QLChuyenBay.models import User, UserRole, Rule, AirPort, FlightRoute, FlightSchedule, BetweenAirport, Ticket, Customer, Seat
 import hashlib
 import re
 import locale
@@ -256,9 +256,9 @@ def get_ticket_list_json(user_id):
     return t_list_json
 
 
-def get_ticket_remain(ticket_id, ticket_type):
+def get_ticket_remain(flight_id, ticket_type):
     f= FlightSchedule.query.filter(FlightSchedule.i_act.__eq__(True), FlightSchedule.i_del.__eq__(False),
-                                   FlightSchedule.id.__eq__(ticket_id)).first()
+                                   FlightSchedule.id.__eq__(flight_id)).all()[0]
     remain=0
     if int(ticket_type)==1:
         remain= f.ticket1_quantity- f.ticket1_book_quantity
@@ -271,7 +271,7 @@ def get_admin_rules_latest():
     return ar
 
 def check_time_ticket(f_id, is_user= True):
-    f = FlightSchedule.query.filter(FlightSchedule.is_active.__eq__(True), FlightSchedule.is_deleted.__eq__(False),
+    f = FlightSchedule.query.filter(FlightSchedule.i_act.__eq__(True), FlightSchedule.i_del.__eq__(False),
                                     FlightSchedule.id.__eq__(f_id)).first()
     ar = get_admin_rules_latest()
     f_ts = f.time_start.timestamp()
@@ -286,7 +286,47 @@ def check_time_ticket(f_id, is_user= True):
         'state': (f_ts - n_ts) / 3600 > ar.time_buy_ticket
     }
 
+def save_customer(customer_name, customer_phone, customer_email):
+    c = Customer(customer_name=customer_name, customer_phone=customer_phone, customer_email=customer_email)
+    db.session.add(c)
+    db.session.commit()
+    return c
 
+def save_seat_number(seat_number, ticket_id, flight_sche_id):
+    s= Seat(seat_number= seat_number, ticket_id= ticket_id, flight_sche_id=flight_sche_id, is_active= True)
+    db.session.add(s)
+    db.session.commit()
+    return s
+
+def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_name, customer_phone,
+                  customer_email, customer_id, user_id, seat_number):
+    f = FlightSchedule.query.filter(FlightSchedule.id.__eq__(flight_id), FlightSchedule.i_act.__eq__(True),
+                                    FlightSchedule.i_del.__eq__(False)).first()
+    if int(ticket_type) == 1:
+        f.ticket1_book_quantity = f.ticket1_book_quantity + 1
+    if int(ticket_type) == 2:
+        f.ticket2_book_quantity = f.ticket2_book_quantity + 1
+    cus = save_customer(customer_name=customer_name, customer_phone=customer_phone, customer_email= customer_email)
+    t = Ticket(author_id=user_id, flight_sche_id=flight_id, customer_id=customer_id,
+               ticket_type=ticket_type, ticket_price= ticket_price, ticket_package_price= package_price, created_at=datetime.datetime.now())
+    db.session.add(t)
+    db.session.commit()
+    ticket_id= Ticket.query.filter(Ticket.author_id.__eq__(user_id) and Ticket.customer_id.__eq__(customer_id)).first().id
+    s = save_seat_number(seat_number=seat_number, ticket_id=ticket_id, flight_sche_id= flight_id)
+    db.session.add(cus, s)
+    db.session.commit()
+    return {
+        "cus":cus,
+        "ticket": t,
+        'seat': s
+    }
+
+def get_seat_number_active(f_id):
+    seat_arr=[]
+    seats= Seat.query.filter(Seat.flight_sche_id.__eq__(f_id))
+    for s in seats:
+        seat_arr.append(s.seat_number)
+    return seat_arr
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)

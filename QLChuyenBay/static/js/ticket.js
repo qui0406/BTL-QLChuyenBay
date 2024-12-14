@@ -1,35 +1,52 @@
-const btnSeat= document.getElementById('choose_seat')
+
+
 const addBtn = document.querySelector('#add-customer')
 const subBtn = document.querySelector('#sub-customer')
 const price = document.querySelector('.price span')
-const select = document.querySelector('form select')
+const select = document.querySelector('#package')
+const btnAccept= document.getElementById('accept_ticket')
+const btnSeat= document.getElementById('choose_seat')
+
+const priceTicket= parseFloat(price.innerHTML.replace(/[^0-9.]/g, ''))
+
+
+//const quantityCustomner = (inputList.length - 2) / 3
+
+let quantityCustomner= 1
 
 let packagePrice = 0;
 
 select.onchange = (e) => {
-    updatePrice(-packagePrice)
+    updatePrice(parseFloat(price.innerHTML.replace(/[^0-9.]/g, '')), 0)
     if (e.target.value == 0) {
         packagePrice = 0
     }
     if (e.target.value == 12) {
-        packagePrice = 320000
+        packagePrice = 320000*quantityCustomner
     }
     if (e.target.value == 20) {
-        packagePrice = 400000
+        packagePrice = 400000*quantityCustomner
     }
-    updatePrice(packagePrice)
+    updatePrice(parseFloat(price.innerHTML.replace(/[^0-9.]/g, '')), packagePrice)
 }
 
-function updatePrice(value) {
-    const data = price.innerHTML.split(",")
-    let total = ""
-    data.forEach(d => {
-        total += d
-    })
-    price.innerHTML = `${Intl.NumberFormat().format(parseInt(total) + parseInt(value))} VNĐ`
+//function updatePrice(priceTicket, packagePrice) {
+////    const data = price.innerHTML.split(",")
+////    let total = ""
+////    data.forEach(d => {
+////        total += d
+////    })
+//    total= priceTicket + packagePrice
+//    price.innerHTML = `${Intl.NumberFormat().format(parseInt(total))} VNĐ`
+//}
+
+function updatePrice(priceTicket, packagePrice){
+    total= priceTicket + packagePrice
+    price.innerHTML = `${Intl.NumberFormat().format(parseInt(total))} VNĐ`
 }
 
 addBtn.onclick=()=>{
+    quantityCustomner++
     const listCustomer = document.querySelectorAll(".customer-info")
     const current = listCustomer.length
 
@@ -52,24 +69,28 @@ addBtn.onclick=()=>{
             </div>
         `
         customer.insertAdjacentHTML("afterend", html)
-        updatePrice(parseInt(price.dataset.price))
+        updatePrice(priceTicket*quantityCustomner, packagePrice* quantityCustomner)
     }
 }
+
 subBtn.onclick = () => {
+    quantityCustomner--
     const listCustomer = document.querySelectorAll(".customer-info")
     const current = listCustomer.length
     if (current > 1) {
         listCustomer[current - 1].remove()
-        updatePrice(parseInt(-price.dataset.price))
+        updatePrice(parseFloat(price.innerHTML.replace(/[^0-9.]/g, ''))- parseFloat(priceTicket)- parseFloat(packagePrice), 0)
     }
 }
 
 btnSeat.onclick=()=>{
     event.preventDefault()
 
+
     const inputList = document.querySelectorAll('form input[required]')
     const inpValidateErr = Array.from(inputList).find(inp => inp.value.length < inp.getAttribute('minlength'))
     const inpErr = Array.from(inputList).find(inp => !inp.value)
+
     if (inpErr) {
         inpErr.focus()
         return Swal.fire("Lỗi", "Vui lòng nhập đủ thông tin!", "error")
@@ -78,58 +99,110 @@ btnSeat.onclick=()=>{
         inpValidateErr.focus()
         return Swal.fire("Lỗi", `Vui lòng nhập ít nhất ${inpValidateErr.getAttribute('minlength')} kí tự!`, "error")
     }
+    scrollToMiddle()
+}
+
+function scrollToMiddle() {
+  const windowHeight = window.innerHeight;
+  const documentHeight = document.body.scrollHeight;
+  const middle = documentHeight / 2;
+  window.scrollTo(0, middle - windowHeight / 2);
+}
+
+const chooseSeatNumber= document.querySelectorAll('.seat')
+const userChooseSeatNumber=[]
+    Array.from(chooseSeatNumber).forEach((seatNumber, index) =>{
+        seatNumber.onchange=()=>{
+//            if(userChooseSeatNumber.length > quantityCustomner){
+//                return Swal.fire("Lỗi", "Vui lòng chọn đúng số lượng ghế!", "error")
+//            }
+            if(seatNumber.checked){
+                userChooseSeatNumber.push(seatNumber.id)
+            }
+        }
+    })
+
+btnAccept.onclick=(e)=>{
+    e.preventDefault()
+    const inputList = document.querySelectorAll('form input[required]')
+
     function findInp(name) {
         return Array.from(inputList).find(inp => inp.classList.contains(name))
     }
-    window.location.href='/choose-seat'
+    const customerInfo = []
+    let cntCustomer=0;
+    Array.from(inputList).forEach((inp, index) => {
+        if (index == 2 || index == 5 || index == 8) {
+            const obj = {
+                id: index,
+                name: inp.value,
+                phone: inputList[index + 1].value,
+                id_customer: inputList[index + 2].value,
+                seat_number: userChooseSeatNumber[cntCustomer++]
+            }
+            customerInfo.push(obj)
+        }
+    })
+
+    const pathNames = window.location.pathname
+    const arr = pathNames.split('/')
+    const fId= arr[arr.length-1]
+
+    const data = {
+        'contact_info': {
+            'name': findInp('name').value,
+            'phone': findInp('phone').value
+        },
+        'customers_info': [
+            {
+                'quantity': customerInfo.length,
+                'data': customerInfo
+            }
+        ],
+        'package_price': packagePrice,
+        'f_id': fId,
+        'ticket_type': document.querySelector('span.ticket-type').innerHTML,
+        'total': parseFloat(price.innerHTML.replace(/[^0-9.]/g, '')),
+        'seat_number': userChooseSeatNumber
+    }
+    if(userChooseSeatNumber.length < quantityCustomner){
+         return Swal.fire("Lỗi", `Vui lòng chọn thêm ${quantityCustomner - userChooseSeatNumber.length} ghế!`, "error")
+    }
+    if(userChooseSeatNumber.length==0){
+        return Swal.fire("Lỗi", "Vui lòng chọn ghế!", "error")
+    }
+    console.log(data)
+    fetch(`/api/ticket/${fId}`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type':'application/json'
+        }
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        if (data.status == 200) {
+            console.log(data)
+            window.location.href = "/list-flight-payment/" + data.data
+        }
+        if (data.status == 500) {
+            Swal.fire("Lỗi", data.data, "error")
+        }
+    })
+    .catch(err => {
+        Swal.fire("Lỗi", err.data, "error")
+    })
 }
+
 
 
 ////
 
 //
-//    const customerInfo = []
-//    const quantityCustomner = (inputList.length - 2) / 3
-//    Array.from(inputList).forEach((inp, index) => {
-//        if (index == 2 || index == 5 || index == 8) {
-//            const obj = {
-//                id: index,
-//                name: inp.value,
-//                phone: inputList[index + 1].value,
-//                id_customer: inputList[index + 2].value
-//            }
-//            customerInfo.push(obj)
-//        }
-//    })
 //
-//    const pathNames = window.location.pathname
-//    const fId = pathNames[pathNames.length - 1]
 //
-//    const data = {
-//        contact_info: {
-//            name: findInp('name').value,
-//            phone: findInp('phone').value
-//        },
-//        customers_info: [
-//            {
-//                quantity: customerInfo.length,
-//                data: customerInfo
-//            }
-//        ],
-//        package_price: packagePrice,
-//        f_id: fId,
-//        ticket_type: document.querySelector('span.ticket-type').innerHTML,
-//        total: price.innerHTML,
-//        user_role: submitBtn.dataset.user
-//    }
-//    fetch(`/api/ticket/${fId}`, {
-//        method: 'post',
-//        body: JSON.stringify(data),
-//        headers: {
-//            "Content-Type": "application/json"
-//        }
-//    })
-//    .then(res => res.json())
+//
+//
 //    .then(data => {
 //        if (data.status == 200 && (submitBtn.dataset.user == 'UserRole.STAFF' || submitBtn.dataset.user == 'UserRole.ADMIN')) {
 //            const inputList = document.querySelectorAll('form input')

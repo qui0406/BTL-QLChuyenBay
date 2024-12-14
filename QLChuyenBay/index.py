@@ -1,3 +1,5 @@
+import stripe
+
 from QLChuyenBay import app, login, otp, mail
 from flask import render_template, request, redirect, url_for, session, jsonify, json, request
 import dao
@@ -8,6 +10,8 @@ import pdb
 
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
+
+from QLChuyenBay.models import Customer
 #from QLChuyenBay.dao import remain_ticket
 from models import UserRole
 
@@ -271,7 +275,9 @@ def choose_seat():
 def get_ticket(flight_id):
     ticket_type= request.args.get('ticket-type')
     f = dao.get_flight_sche_json(flight_id)
-    return render_template('ticket.html',ticket_type=ticket_type, f=f, user_role=UserRole)
+    seat_active= dao.get_seat_number_active(flight_id)
+    return render_template('ticket.html',ticket_type=ticket_type, f=f,
+                           user_role=UserRole, seat_active= seat_active)
 
 @app.route('/api/momo_ipn', methods=['post'])
 def momo_ipn():
@@ -282,38 +288,85 @@ def bill_ticket(user_id):
     ticket_list_json=dao.get_ticket_list_json(user_id= user_id)
     return render_template('billTicket.html', ticket_list_json= ticket_list_json)
 
-@app.route('/api/create_ticket/<int:f_id>', methods=['post'])
-def create_ticket():
+@app.route('/api/ticket/<int:f_id>', methods=['post'])
+def create_ticket(f_id):
     data= request.json
-    id = data.get('id')
-    type_ticket= data.get('type_ticket')
-
+    id = data.get('f_id')
+    type_ticket= data.get('ticket_type')
     session['ticket']= data
     remain_ticket=dao.get_ticket_remain(id, type_ticket)
+
     if remain_ticket < data['customers_info'][0]['quantity']:
         return {
             'status': 500,
             'data': "Chỉ có thể đặt tối đa %s vé!" % remain_ticket
         }
-    if data['user_role'] == 'UserRole.STAFF' or data['user_role'] == 'UserRole.ADMIN':
-        check_time = dao.check_time_ticket(id, is_user=False)
-        if not check_time['state']:
-            return {
-                'status': 500,
-                'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
-            }
-        # pay_ticket(data['f_id'], is_staff=True)
-    else:
-        check_time = dao.check_time_ticket(id)
-        if not check_time['state']:
-            return {
-                'status': 500,
-                'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
-            }
+    # if data['user_role'] == 'UserRole.STAFF' or data['user_role'] == 'UserRole.ADMIN':
+    #     check_time = dao.check_time_ticket(id, is_user=False)
+    #     if not check_time['state']:
+    #         return {
+    #             'status': 500,
+    #             'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
+    #         }
+    #     # pay_ticket(data['f_id'], is_staff=True)
+    # else:
+    # check_time = dao.check_time_ticket(id)
+    # import pdb
+    # pdb.set_trace()
+    # if not check_time['state']:
+    #     return {
+    #         'status': 500,
+    #         'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
+    #     }
     return {
         'status': 200,
         'data': data['f_id']
     }
+
+@app.route('/create-checkout-session/<int:f_id>', methods=['post'])
+def create_checkout_session(f_id):
+    try:
+        checkout_session= stripe.checkout.Session.create(
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'vnd',
+                        'product_data': {
+                            'name': 'PhuQuiAirFlight',
+                        },
+                        'unit_amount': int(session['ticket']['total']),
+                    },
+                    'quantity': 1
+                }
+            ],
+            mode='payment',
+            success_url=app.config['MY_DOMAIN'] + '/bill_ticket/' + session['ticket']['f_id'],
+            cancel_url= app.config['MY_DOMAIN'] + '/error'
+        )
+    except Exception as e:
+        return str(e)
+    else:
+        user_id = current_user.get_id()
+        flight_id = session['ticket']['f_id']
+        package_price = session['ticket']['package_price']
+        ticket_type = session['ticket']['ticket_type']
+        data_customer= session['ticket']['customers_info'][0]['data']
+        number_customer= len(data_customer)
+        ticket_price= (int(session['ticket']['total']) - int(package_price)*number_customer)/ number_customer
+        for d in data_customer:
+            cr = dao.create_ticket(user_id=user_id, flight_id=flight_id, customer_id= d['id'], ticket_price= ticket_price,
+                                   ticket_type=ticket_type, package_price=package_price, customer_email= d['id_customer'],
+                                   customer_phone= d['phone'], customer_name= d['name'],
+                                   seat_number= d['seat_number'])
+    return redirect(checkout_session.url, code= 303)
+
+@app.route('/error')
+def error():
+    return 'error'
+
+@app.route('/list-flight-payment/<int:f_id>')
+def list_flight_payment(f_id):
+    return render_template('listFlightChoose.html')
 
 
 @login.user_loader
@@ -328,4 +381,4 @@ def common_attributes():
 
 if __name__ == '__main__':
     from QLChuyenBay.admin import *
-    app.run(debug=True, host='localhost', port=5002)
+    app.run( debug=True, host='localhost', port=5002)

@@ -119,6 +119,7 @@ class Ticket(BaseModel):
 class Seat(BaseModel):
     __table_args__= {'extend_existing': True}
     seat_number= Column(Integer, nullable=False, unique= True)
+    flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id), nullable= False)
     ticket_id= Column(Integer, ForeignKey(Ticket.id), nullable= False)
     is_active= Column(Boolean, default= False)
 
@@ -128,7 +129,7 @@ def user_load(user_id):
 
 if __name__=="__main__":
     with app.app_context():
-       #db.create_all()
+       # db.create_all()
        pass
         # a1 = AirPort(name="Tân Sơn Nhất")
         # a2 = AirPort(name="Nội Bài")
