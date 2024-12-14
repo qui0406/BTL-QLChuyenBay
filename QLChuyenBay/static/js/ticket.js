@@ -17,7 +17,7 @@ let quantityCustomner= 1
 let packagePrice = 0;
 
 select.onchange = (e) => {
-    updatePrice(parseFloat(price.innerHTML.replace(/[^0-9.]/g, '')), 0)
+    updatePrice(priceTicket* quantityCustomner, 0)
     if (e.target.value == 0) {
         packagePrice = 0
     }
@@ -29,16 +29,6 @@ select.onchange = (e) => {
     }
     updatePrice(parseFloat(price.innerHTML.replace(/[^0-9.]/g, '')), packagePrice)
 }
-
-//function updatePrice(priceTicket, packagePrice) {
-////    const data = price.innerHTML.split(",")
-////    let total = ""
-////    data.forEach(d => {
-////        total += d
-////    })
-//    total= priceTicket + packagePrice
-//    price.innerHTML = `${Intl.NumberFormat().format(parseInt(total))} VNĐ`
-//}
 
 function updatePrice(priceTicket, packagePrice){
     total= priceTicket + packagePrice
@@ -85,7 +75,6 @@ subBtn.onclick = () => {
 
 btnSeat.onclick=()=>{
     event.preventDefault()
-
 
     const inputList = document.querySelectorAll('form input[required]')
     const inpValidateErr = Array.from(inputList).find(inp => inp.value.length < inp.getAttribute('minlength'))

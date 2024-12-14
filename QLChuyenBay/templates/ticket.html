@@ -150,9 +150,13 @@
 
         {%endfor%}
         <div>
+            {%if current_user.is_authenticated%}
             <button id="accept_ticket" class="btn btn-danger mx-2 w-100">
                 Xác nhận đặt vé
             </button>
+            {%else%}
+            <a href="{{ url_for('user_login', next=request.url) }}">Đăng nhập để xác nhận đặt vé...</a>
+            {%endif%}
         </div>
     </form>
 </div>

@@ -101,11 +101,12 @@ def user_login():
         user = dao.auth_user(username=username, password=password)
         if user:
             login_user(user=user)
+            next_page = request.args.get('next')
             if user.user_role.value == UserRole.ADMIN.value:
                 return redirect('/admin')
             if user.user_role.value == UserRole.STAFF.value:
                 return redirect('/admin')
-            return render_template('index.html')
+            return redirect(next_page) if next_page else render_template('index.html')
         else:
             err_msg = "Username hoac password khong chinh xac!!!"
     return render_template('login.html', err_msg=err_msg)
@@ -267,10 +268,6 @@ def search_flight_schedule():
 def flight_list():
     return render_template('flightList.html')
 
-@app.route('/choose-seat')
-def choose_seat():
-    return render_template('seat.html')
-
 @app.route('/ticket/<int:flight_id>')
 def get_ticket(flight_id):
     ticket_type= request.args.get('ticket-type')
@@ -287,6 +284,7 @@ def momo_ipn():
 def bill_ticket(user_id):
     ticket_list_json=dao.get_ticket_list_json(user_id= user_id)
     return render_template('billTicket.html', ticket_list_json= ticket_list_json)
+
 
 @app.route('/api/ticket/<int:f_id>', methods=['post'])
 def create_ticket(f_id):
@@ -323,6 +321,7 @@ def create_ticket(f_id):
         'data': data['f_id']
     }
 
+@login_required
 @app.route('/create-checkout-session/<int:f_id>', methods=['post'])
 def create_checkout_session(f_id):
     try:
@@ -364,6 +363,7 @@ def create_checkout_session(f_id):
 def error():
     return 'error'
 
+@login_required
 @app.route('/list-flight-payment/<int:f_id>')
 def list_flight_payment(f_id):
     return render_template('listFlightChoose.html')
