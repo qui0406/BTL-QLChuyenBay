@@ -9,8 +9,6 @@ from flask_principal import Principal
 import stripe
 
 
-
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:12345678@localhost/qlchuyenbay?charset=utf8mb4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
@@ -31,6 +29,7 @@ cloudinary.config(
 )
 
 stripe.api_key= 'sk_test_51QVbF6GdmuuxpPW1WKDGv0LbqFP9D7ilJcLKa2jLf5tE0r6TkWteM0GTeLTsGjHU3oaB3tHFNbydVhhdOyZmFdaX00BJJPujHJ'
+endpoint_secret= 'whsec_wRNftLajMZNeslQOP6vEPm4iVx5NlZ6z'
 
 otp= randint(000000, 999999)
 mail=Mail(app=app)

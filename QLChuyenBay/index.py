@@ -1,6 +1,5 @@
 import stripe
-
-from QLChuyenBay import app, login, otp, mail
+from QLChuyenBay import app, login, otp, mail, endpoint_secret
 from flask import render_template, request, redirect, url_for, session, jsonify, json, request
 import dao
 import cloudinary.uploader
@@ -349,7 +348,6 @@ def create_checkout_session(f_id):
     except Exception as e:
         return str(e)
     else:
-
         user_id = current_user.get_id()
         flight_id = session['ticket']['f_id']
         package_price = session['ticket']['package_price']
@@ -364,7 +362,35 @@ def create_checkout_session(f_id):
                                    customer_phone=  session['ticket']['customers_info'][0]['data'][d]['phone'],
                                    customer_name=  session['ticket']['customers_info'][0]['data'][d]['name'],
                                    seat_number=  session['ticket']['customers_info'][0]['data'][d]['seat_number'])
+
     return redirect(checkout_session.url, code= 303)
+
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    payload = request.data
+    sig_header = request.headers['Stripe-Signature']
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except ValueError as e:
+        # Invalid payload
+        return 'Invalid payload', 400
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return 'Invalid signature', 400
+    if event['type'] == 'checkout.session.completed':
+        user_id = current_user.get_id()
+        email = dao.get_email_by_user(user_id)
+        session = event['data']['object']
+        msg = Message(subject='Thông báo về việc thanh toán vé máy bay PhuQuiAirFlight',
+                      sender='anhqui04062004@gmail.com', recipients=[email])
+        msg.body = ('Bạn đã thanh toán thành công: ' + str(session['ticket']['total']) +
+                    ' VND. Chúc bạn có một chuyến đi tốt lành')
+        mail.send(msg)
+    return 'succedd', 200
+
 
 @app.route('/error')
 def error():

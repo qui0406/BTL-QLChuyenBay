@@ -55,7 +55,8 @@ def save_admin_rules(min_time_flight, max_quantity_between_airport, min_time_sta
 def get_rule_admin():
     return Rule.query.order_by(Rule.created_at.desc()).first()
 
-
+def get_email_by_user(id):
+    return User.query.filter(User.id.__eq__(id)).first().email
 
 def get_id_by_name_airport(name):
     return AirPort.query.filter(AirPort.name.__eq__(name)).first().id
