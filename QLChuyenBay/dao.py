@@ -264,8 +264,6 @@ def get_ticket_list_json(user_id):
     t_list_json = []
     for t in t_list:
         t_list_json.append(get_ticket_json(t.id, quantity))
-    import pdb
-    pdb.set_trace()
     return t_list_json
 
 

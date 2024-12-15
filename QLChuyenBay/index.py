@@ -276,8 +276,6 @@ def get_ticket(flight_id):
     f = dao.get_flight_sche_json(flight_id)
     seat_active= dao.get_seat_number_active(flight_id)
 
-    import pdb
-    pdb.set_trace()
     return render_template('ticket.html',ticket_type=ticket_type, f=f,
                            user_role=UserRole, seat_active= seat_active)
 
@@ -351,18 +349,21 @@ def create_checkout_session(f_id):
     except Exception as e:
         return str(e)
     else:
+
         user_id = current_user.get_id()
         flight_id = session['ticket']['f_id']
         package_price = session['ticket']['package_price']
         ticket_type = session['ticket']['ticket_type']
-        data_customer= session['ticket']['customers_info'][0]['data']
-        number_customer= len(data_customer)
-        ticket_price= (int(session['ticket']['total']) - int(package_price))/ number_customer
-        for d in data_customer:
-            cr = dao.create_ticket(user_id=user_id, flight_id=flight_id, customer_id= d['id'], ticket_price= ticket_price,
-                                   ticket_type=ticket_type, package_price=package_price, customer_email= d['id_customer'],
-                                   customer_phone= d['phone'], customer_name= d['name'],
-                                   seat_number= d['seat_number'])
+        ticket_price= (int(session['ticket']['total']) - int(package_price))
+        for d in range(len(session['ticket']['customers_info'][0]['data'])):
+            cr = dao.create_ticket(user_id=user_id, flight_id=flight_id,
+                                   customer_id= session['ticket']['customers_info'][0]['data'][d]['id'],
+                                   ticket_price= ticket_price,
+                                   ticket_type=ticket_type, package_price=package_price,
+                                   customer_email=  session['ticket']['customers_info'][0]['data'][d]['id_customer'],
+                                   customer_phone=  session['ticket']['customers_info'][0]['data'][d]['phone'],
+                                   customer_name=  session['ticket']['customers_info'][0]['data'][d]['name'],
+                                   seat_number=  session['ticket']['customers_info'][0]['data'][d]['seat_number'])
     return redirect(checkout_session.url, code= 303)
 
 @app.route('/error')
