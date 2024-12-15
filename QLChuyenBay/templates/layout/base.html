@@ -12,6 +12,8 @@
             crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
          {%block css%} {% endblock%}
         {%block js%} {% endblock%}
 </head>
@@ -19,7 +21,7 @@
     {%block header%}
         {% include 'layout/header.html' %}
     {% endblock%}
-    <div class="container my-md-auto mx-md-auto w-100 w-md-75 w-lg-50 mx-auto ">
+    <div class="container my-md-auto mx-md-auto ">
         {%block content%} {% endblock%}
     </div>
 

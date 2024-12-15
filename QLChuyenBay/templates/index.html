@@ -9,104 +9,57 @@
     </option>
     {% endfor %}
 </datalist>
-<h2 class="text-center fw-bold my-5">
+<h2 class="text-center fw-bold my-2">
     Tìm chuyến bay
 </h2>
-<div class=" d-flex justify-content-around">
+<div class=" d-flex justify-content-around w-100">
 
     <div class="aircraft-image d-none d-lg-block">
         <img src="https://img.static-af.com/images/media/E56219E9-21C7-4BB0-B7A5F5353A5140D3/" class="rounded w-45"
              alt="">
     </div>
-    <div class="justify-content-center row search-form">
-
-        <form method="post" action="" class="w-100 my-auto p-4 bg-white shadow-lg rounded-1 ">
-
-
-            <!--            <div class="d-flex gap-3">-->
-            <!--                <div class="form-check">-->
-            <!--                    <input class="form-check-input" type="radio" name="ticketType" id="ticketType-1" checked>-->
-            <!--                    <label class="form-check-label" for="ticketType-1">-->
-            <!--                        Vé một chiều-->
-            <!--                    </label>-->
-            <!--                </div>-->
-            <!--                <div class="form-check">-->
-            <!--                    <input class="form-check-input" type="radio" name="ticketType" id="ticketType-2">-->
-            <!--                    <label class="form-check-label" for="ticketType-1">-->
-            <!--                        Vé khứ hồi-->
-            <!--                    </label>-->
-            <!--                </div>-->
-            <!--            </div>-->
+    <div class="search-form justify-content-center row">
+        <form action="javascript:;" class=" my-auto p-4 bg-white shadow-lg rounded-1">
+            <div class="d-flex gap-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="ticketType" id="ticketType-1" checked>
+                    <label class="form-check-label" for="ticketType-1">
+                        Vé một chiều
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="ticketType" id="ticketType-2">
+                    <label class="form-check-label" for="ticketType-1">
+                        Vé khứ hồi
+                    </label>
+                </div>
+            </div>
             <div class="mt-2">
                 <div>
-                    <label for="ap_from" class="form-label">Từ:</label>
-                    <input class="form-control" list="airports" name="from" id="ap_from">
-                    {% if session['inp_search'] %}
-                    value="{{ '%s - %s' % (session['inp_search'].airport_from.id,
-                    session['inp_search'].airport_from.name) }}"
-                    {% endif %}
-
+                    <label for="departure_airport" class="form-label">Chọn sân bay đi:</label>
+                    <input class="form-control" list="airports" name="from" id="departure_airport">
                 </div>
-
                 <div>
-                    <label for="ap_to" class="form-label">Đến:</label>
-                    <input class="form-control" list="airports" name="to" id="ap_to">
-                    {% if session['inp_search'] %}
-                    value="{{ '%s - %s' % (session['inp_search'].airport_to.id, session['inp_search'].airport_to.name)
-                    }}"
-                    {% endif %}
+                    <label for="arrival_airport" class="form-label">Chọn sân bay đến:</label>
+                    <input class="form-control" name="from" list="airports" id="arrival_airport">
                 </div>
             </div>
             <div class="mt-2 d-flex gap-3">
                 <div class="flex-grow-1">
                     <label for="time_start" class="form-label">Ngày đi:</label>
-                    <input class="form-control" name="dayStart" id="time_start" type="date"
-                           {% if session['inp_search'] %}
-                    value="{{ session['inp_search'].time_start }}"
-                    {% endif %}
-                    >
+                    <input class="form-control" name="dayStart" id="time_start" type="date">
                 </div>
                 <div class="align-self-end">
-                    <label for="ticket_type" class="form-label">Ghế:</label>
+                    <label for="ticket_type" class="form-label">Loại vé:</label>
                     <select id="ticket_type" name="rankChair" class="form-select">
-                        <option {% if session[
-                        'inp_search'] and session["inp_search"].ticket_type=="1" %}selected="selected"{% endif %}
-                        value="1">Hạng 1</option>
-                        <option {% if session[
-                        'inp_search'] and session['inp_search'].ticket_type=="2" %}selected="selected"{% endif %}
-                        value="2">Hạng 2</option>
-                    </select>
-                </div>
-                <div class="align-self-end">
-                    <label for="ticket_quantity" class="form-label">Số lượng vé:</label>
-                    <select id="ticket_quantity" name="ticket_quantity" class="form-select">
-                        <option value="1" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "1" %}selected{% endif %}>1</option>
-                        <option value="2" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "2" %}selected{% endif %}>2</option>
-                        <option value="3" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "3" %}selected{% endif %}>3</option>
-                        <option value="4" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "4" %}selected{% endif %}>4</option>
-                        <option value="5" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "5" %}selected{% endif %}>5</option>
-                        <option value="6" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "6" %}selected{% endif %}>6</option>
-                        <option value="7" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "7" %}selected{% endif %}>7</option>
-                        <option value="8" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "8" %}selected{% endif %}>8</option>
-                        <option value="9" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "9" %}selected{% endif %}>9</option>
-                        <option value="10" {% if session[
-                        'inp_search'] and session["inp_search"].ticket_quantity == "10" %}selected{% endif
-                        %}>10</option>
+                        <option value="1">Hạng 1</option>
+                        <option value="2">Hạng 2</option>
                     </select>
                 </div>
             </div>
-            <button id="submit-btn" type="submit" class="mt-4 w-100 btn btn-warning">Tìm chuyến bay</button>
+            <button onclick="searchFlight()" class="mt-4 w-100 btn btn-primary">Tìm chuyến bay</button>
         </form>
     </div>
 </div>
-
+<script src="{{url_for('static', filename='js/index.js')}}"></script>
 {%endblock%}

@@ -13,7 +13,7 @@
 </div>
 
 {%endif%}
-<div class="wrapper wrapper w-100 w-md-75 w-lg-50 mx-auto mt-5 ">
+<div class="wrapper w-lg-50 mx-auto mt-5 bg-light shadow p-3 mb-5 bg-body rounded">
     <form method="POST" action="{{url_for('user_login')}}" class="was-validated">
         <div class="mb-3 mt-3">
             <label for="username" class="form-label">Username:</label>
@@ -28,13 +28,16 @@
             <div class="valid-feedback">Valid.</div>
             <div class="invalid-feedback">Please fill out this field.</div>
         </div>
-        <div>
-            <div><a class="text text-decoration-none" href="{{url_for('user_register')}}">Bạn chưa có tài khoản? </a>
+        <div class="login-button d-flex justify-content-between align-items-center">
+            <div>Chưa có tài khoản?
+                <a class="text text-decoration-none" href="{{url_for('user_register')}}">Đăng ký ngay! </a>
             </div>
+
+            <div><a class="text text-decoration-none" href="{{url_for('user_verify')}}">Quên mật khẩu?</a></div>
+            <button type="submit" class="btn btn-primary">Đăng nhập</button>
         </div>
         <div class="mb-3 mt-3">
-            <button type="submit" class="btn btn-danger">Đăng nhập</button>
-            <div><a class="text text-decoration-none" href="{{url_for('user_verify')}}">Bạn quên mật khẩu?</a></div>
+
         </div>
     </form>
 </div>

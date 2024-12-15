@@ -54,10 +54,8 @@ h1.subject {
     justify-content: center;
     align-items: center;
     background-color: #1d6a85;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%
+
+    margin-top: 1rem;
 
  }
  div.footer-text{
@@ -78,3 +76,67 @@ h1.subject {
     height: 100%;
     object-fit: cover;
  }
+
+
+
+
+/* Flight List*/
+
+.time {
+     font-weight: bold; /* In đậm */
+    font-size: 20px;   /* Kích thước chữ */
+    font-family: Tahoma, sans-serif; /* Font chữ */
+    color: #1d6a85;
+}
+
+.airport-location{
+    font-size: 20px;   /* Kích thước chữ */
+    font-family: Tahoma, sans-serif; /* Font chữ */
+}
+
+.book-ticket{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width:150px;
+    height:130px;
+    text-align:center;
+
+    font-size:16px;
+    font-family: Tahoma, sans-serif;
+}
+.book-ticket:hover{
+    transform: scale(1.05);
+    transition: transform 0.1s ease;
+}
+
+.book-ticket.eco {
+    background-color:#1d6a85;
+    color: #fff;
+}
+ /* Dành cho màn hình nhỏ (điện thoại) */
+@media (max-width: 576px) {
+    .container{
+        width: 100%;
+    }
+
+}
+
+/* Dành cho màn hình vừa (máy tính bảng) */
+@media (min-width: 577px) and (max-width: 768px) {
+    .container {
+        width: 80%;
+    }
+    .ticket-flight-info{
+        width:100%;
+    }
+}
+
+@media (min-width: 889px) {
+    .wrapper {
+        width: 40%;
+    }
+    .ticket-flight-info{
+    width:40%
+    }
+}
