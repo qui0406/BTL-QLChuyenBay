@@ -190,9 +190,7 @@ def create_flight_schedule():
     price_type_1= data.get('price_type_1')
     price_type_2= data.get('price_type_2')
     airport_between_list= data.get('airportBetweenList')
-
     try:
-
         f = dao.create_flight_sche(depart_airport=depart_airport,
                                    arrival_airport=arrival_airport,
                                    time_start=time_start,
@@ -201,11 +199,6 @@ def create_flight_schedule():
                                    quantity_2nd_ticket=quantity_2nd_ticket,
                                    price_type_1= price_type_1,
                                    price_type_2= price_type_2)
-        # if f['status'].__eq__('500'):
-        #     return {
-        #         'status': 500,
-        #         'data': 'Tuyến bay không tồn tại'
-        #     }
         for i in airport_between_list:
             bwa= dao.create_between_airport(airport_id=int(i['ap_id']),
                                             flight_sche_id=int(f.id),

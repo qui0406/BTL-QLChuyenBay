@@ -1,5 +1,4 @@
 const btnAddBwAirport = document.querySelector('.add-bw-airport')
-const airportBetween= document.querySelectorAll('.airport-between')
 const submitBtn = document.querySelector('.submit-btn')
 const start = document.querySelector('#time-start')
 const end = document.querySelector('#time-end')
@@ -12,12 +11,14 @@ const quantity_2nd_ticket= document.querySelector('#quantity-2nd-ticket')
 const inpR = document.querySelectorAll("form input[required]")
 const dataList = document.querySelector('datalist#airports')
 
+let quantityBetweenAirport= 0
+
 function addBetweenAirport(max) {
     const airportBetween= document.querySelectorAll('.airport-between')
-    let currentLength= airportBetween.length - 1
+    let currentLength= quantityBetweenAirport
     if(currentLength < max){
         const html= `
-            <div class="row airport-between mt-3">
+            <div class="row airport-between mt-3" id='ab-${currentLength}'>
                 <div class="col-lg-3">
                     <label for="airport-bw-${currentLength}" class="form-label">Sân bay trung gian ${currentLength + 1}:
                     </label>
@@ -29,14 +30,32 @@ function addBetweenAirport(max) {
                 </div>
                 <div class="col-lg-6">
                     <label for="airport-bw-note-${currentLength}" class="form-label">Ghi chú:</label>
-                    <input name="airport_bw_note_${currentLength}" type="text" class="form-control" id="airport-bw-note-${currentLength}">
+                    <div class=" d-flex justify-content-between">
+                        <div class="col-lg-12">
+                            <input name="airport_bw_note_${currentLength}" type="text" class="form-control" id="airport-bw-note-${currentLength}">
+                        </div>
+                        <div class="col-lg">
+                            <span onclick="deleteAirportBetween(${currentLength})" id="sub-flightSche-${currentLength}" class="ms-2 btn btn-danger">-</span>
+                        </div>
+                    </div>
                 </div>
             </div>`
+
         airportBetween[currentLength].insertAdjacentHTML('afterend', html )
         btnAddBwAirport.innerHTML = `Thêm sân bay trung gian (Còn lại ${max - currentLength - 1})`
+        quantityBetweenAirport++
     }else{
         Swal.fire("Lỗi", "Vượt quá quy định số sân bay trung gian!", "error")
     }
+}
+function deleteAirportBetween(curr){
+    const max = parseFloat(dataList.dataset.maxquantity)
+    const abSelectDel= document.getElementById(`ab-${curr}`)
+    abSelectDel.style.display='none'
+    if(quantityBetweenAirport>0){
+        quantityBetweenAirport--
+    }
+    btnAddBwAirport.innerHTML = `Thêm sân bay trung gian (Còn lại ${max - quantityBetweenAirport })`
 }
 
 function validateDatetime(datetime) {
@@ -54,6 +73,7 @@ function checkMinTimeFly(dStart, dEnd) {
 }
 
 function checkTimeStay(min, max) {
+    const airportBetween= document.querySelectorAll('.airport-between')
     let error = true
     airportBetween.forEach(ab => {
         const ap_stay = ab.querySelector("div:nth-child(2) > input").value
@@ -68,8 +88,9 @@ function checkTimeStay(min, max) {
 function getData(){
     const min = parseFloat(dataList.dataset.mintimestay)
     const max = parseFloat(dataList.dataset.maxtimestay)
+    const airportBetween = document.querySelectorAll(".airport-between")
 
-    const checkTime =   validateDatetime(new Date(start.value))
+    const checkTime = validateDatetime(new Date(start.value))
                         && new Date(end.value).getTime() - new Date(start.value).getTime()
     const checkAirport = da.value && da.value === aa.value
 
@@ -102,11 +123,10 @@ function getData(){
     if (!checkTimeStay(min, max)) {
         return Swal.fire("Lỗi", `Thời gian dừng phải trong khoảng ${min} - ${max} phút !`, "error");
     }
-
     airportBetween.forEach((ab, index)=>{
-       const ap_id = ab.querySelector("div:first-child > input").value
+        const ap_id = ab.querySelector("div:first-child > input").value
        const ap_stay = ab.querySelector("div:nth-child(2) > input").value
-       const ap_note = ab.querySelector("div:nth-child(3) > input").value
+       const ap_note = ab.querySelector("div:nth-child(3) > div > div > input").value
 
        if (ap_id && (ap_id == da.value || ap_id == aa.value)) {
           check= true
@@ -120,6 +140,7 @@ function getData(){
            }
            airportBetweenList.push(obj)
        }
+
     })
      fetch('/api/flight-schedule', {
            method: "POST",
@@ -158,27 +179,15 @@ function getData(){
         });
 }
 
-function openModal() {
-  document.getElementById("myModal").style.display = "block";
-}
+
 
 // Get the modal
-var modal = document.getElementById("myModal");
+
 
 // Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+
 
 // When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
 
 function btnDetails(flight_schedule_id){
     fetch('/api/flight-schedule/details-schedule', {
