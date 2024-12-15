@@ -47,8 +47,6 @@ class Rule(BaseModel):
 class AirPort(BaseModel):
     __table_args__ = {'extend_existing': True}
     name= Column(String(100), nullable=False)
-    #location = Column(String(100), nullable=True)
-
     # details= relationship('FlightRoute', backref='airport', lazy= True)
 
     def __str__(self):
@@ -121,6 +119,7 @@ class Ticket(BaseModel):
 class Seat(BaseModel):
     __table_args__= {'extend_existing': True}
     seat_number= Column(Integer, nullable=False, unique= True)
+    flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id), nullable= False)
     ticket_id= Column(Integer, ForeignKey(Ticket.id), nullable= False)
     is_active= Column(Boolean, default= False)
 
@@ -130,21 +129,21 @@ def user_load(user_id):
 
 if __name__=="__main__":
     with app.app_context():
-       #db.create_all()
-       # pass
-        a1 = AirPort(name="Tân Sơn Nhất")
-        a2 = AirPort(name="Nội Bài")
-        a3 = AirPort(name="Côn Đảo")
-        a4 = AirPort(name="Cà Mau")
-        a5 = AirPort(name="Cần Thơ")
-        a6 = AirPort(name="Phú Bài")
-        a7 = AirPort(name="Vân Đồn")
-        a8 = AirPort(name="Đà Nẵng")
-        a9 = AirPort(name="Phú Quốc")
-        a10 = AirPort(name="Vinh")
-
-        db.session.add_all([a1, a2, a3, a4, a5, a6, a7, a8, a9, a10])
-        db.session.commit()
-        a = Rule()
-        db.session.add(a)
-        db.session.commit()
+       # db.create_all()
+       pass
+        # a1 = AirPort(name="Tân Sơn Nhất")
+        # a2 = AirPort(name="Nội Bài")
+        # a3 = AirPort(name="Côn Đảo")
+        # a4 = AirPort(name="Cà Mau")
+        # a5 = AirPort(name="Cần Thơ")
+        # a6 = AirPort(name="Phú Bài")
+        # a7 = AirPort(name="Vân Đồn")
+        # a8 = AirPort(name="Đà Nẵng")
+        # a9 = AirPort(name="Phú Quốc")
+        # a10 = AirPort(name="Vinh")
+        #
+        # db.session.add_all([a1, a2, a3, a4, a5, a6, a7, a8, a9, a10])
+        # db.session.commit()
+        # a = Rule()
+        # db.session.add(a)
+        # db.session.commit()

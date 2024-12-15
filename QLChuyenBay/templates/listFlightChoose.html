@@ -1,0 +1,38 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+<h1>Thông tin các vé đã đặt</h1>
+<p>Bạn nên kiểm tra các vé đã đặt lại 1 lần nữa trước khi thanh toán</p>
+<h3>Người liên hệ: <span>{{session['ticket']['contact_info']['name']}}</span></h3>
+<p>Số điện thoại liên hệ: <span>{{session['ticket']['contact_info']['phone']}}</span></p>
+
+<h3 class="my-3">Thông tin về vé đã đặt</h3>
+<table class="table mt-4">
+    <tr>
+        <th scope="col">Mã vé</th>
+        <th scope="col">Tên khách hàng</th>
+        <th scope="col">Số điện thoại</th>
+        <th scope="col">Email</th>
+        <th scope="col">Số ghế</th>
+        <th scope="col">Loại vé</th>
+    </tr>
+    {% for t in session['ticket']['customers_info'][0]['data'] %}
+    <tr>
+        <th>{{t.id}}</th>
+        <th>{{t.name}}</th>
+        <th>{{t.phone}}</th>
+        <th>{{t.id_customer}}</th>
+        <th>{{t.seat_number}}</th>
+        <th>Vé hạng {{session['ticket']['ticket_type']}}</th>
+    </tr>
+    {%endfor%}
+</table>
+    <h4 class="text text-center text-success">Tổng số tiền phải thanh toán: <span>{{session['ticket']['total']}}</span></h4>
+
+<form action="/create-checkout-session/{{session['ticket']['f_id']}}" method="POST">
+     <button type="submit" id="btn-checkout" class="btn btn-success">
+        Thanh toán qua stripe
+    </button>
+</form>
+{%endblock%}
