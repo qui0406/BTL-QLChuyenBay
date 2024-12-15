@@ -128,20 +128,20 @@
         {%for x in range(1, 200, 6)%}
         <div class="d-flex justify-content-between">
             <div>
-                <input class="seat" style="width:45px; height:30px;" type="checkbox" id="{{x}}"
+                <input class="seat" style="width:45px; height:30px;" type="checkbox" id="check{{x}}"
                        name="seat{{x}}">
-                <input class="seat" style="width:45px; height:30px;"  type="checkbox" id="{{x+1}}"
-                       name="seat{{x}}">
-                <input class="seat" style="width:45px; height:30px;"  type="checkbox" id="{{x+2}}"
-                       name="seat{{x}}">
+                <input class="seat" style="width:45px; height:30px;"  type="checkbox" id="check{{x+1}}"
+                       name="seat{{x+1}}">
+                <input class="seat" style="width:45px; height:30px;"  type="checkbox" id="check{{x+2}}"
+                       name="seat{{x+2}}">
             </div>
             <div>
-                <input class="seat" style="width:45px; height:30px;"  type="checkbox" id="{{x+3}}"
-                       name="seat{{x}}">
-                <input class="seat" style="width:45px; height: 30px;"  type="checkbox" id="{{x+4}}"
-                       name="seat{{x}}">
-                <input class="seat" style="width:45px; height: 30px;" type="checkbox" id="{{x+5}}"
-                       name="seat{{x}}">
+                <input class="seat" style="width:45px; height:30px;"  type="checkbox" id="check{{x+3}}"
+                       name="seat{{x+3}}">
+                <input class="seat" style="width:45px; height: 30px;"  type="checkbox" id="check{{x+4}}"
+                       name="seat{{x+4}}">
+                <input class="seat" style="width:45px; height: 30px;" type="checkbox" id="check{{x+5}}"
+                       name="seat{{x+5}}">
             </div>
         </div>
         {%if x== 97%}
@@ -162,13 +162,14 @@
 </div>
 {% block js %}
 <script>
-   {%for s in seat_active%}
-        const seatId{{s}}= document.getElementById('{{s}}')
-        seatId{{s}}.checked= isChecked
-        seatId{{s}}.disable= isReadonly
-   {%endfor%}
+    {%for s in seat_active%}
+        alert(s)
+    {%endfor%}
 </script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script defer src="{{ url_for('static', filename='js/ticket.js') }}"></script>
+
 {% endblock %}
 {% endblock %}

@@ -20,6 +20,10 @@ class AuthenticatedAdminView(BaseView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role.value == UserRole.ADMIN.value
 
+class AuthenticatedStaffView(BaseView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.user_role.value == UserRole.STAFF.value
+
 class AuthenticatedAdmin(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role.value == UserRole.ADMIN.value
@@ -49,6 +53,13 @@ class FlightScheduleView(AuthenticatedStaff):
         flight_sche_list= dao.get_flight_sche_list()
         return self.render('admin/flightSche.html',  list_airport= list_airport, route_list= route_list,
                            rules= rules, flight_sche_list=flight_sche_list)
+
+class FlightRouteAvailableView(AuthenticatedStaffView):
+    @expose('/')
+    def index(self):
+        list_airport = dao.get_air_port_list()
+        route_list = dao.get_route_list()
+        return self.render('admin/flightRouteAvailable.html', list_airport=list_airport, route_list=route_list)
 
 class UserView(AuthenticatedAdmin):
     column_searchable_list = ['username', 'user_role']
@@ -83,6 +94,7 @@ class StatsView(AuthenticatedAdminView):
 admin= Admin(app=app, name='Quản lý chuyến bay', template_mode='bootstrap4', index_view= MyAdminIndex())
 admin.add_view(UserView(User, db.session, name='Người dùng'))
 admin.add_view(AirportView(AirPort, db.session, name='Sân bay'))
+admin.add_view(FlightRouteAvailableView(name= 'Tuyến bay sẵn có'))
 admin.add_view(FlightScheduleView(FlightSchedule, db.session, name= 'Lập lịch bay'))
 admin.add_view(RouteFlightView(name= 'Tuyến bay'))
 admin.add_view(RulesView(name='Quản lý quy định'))

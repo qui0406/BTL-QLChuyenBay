@@ -114,7 +114,7 @@ class Ticket(BaseModel):
     ticket_type= Column(Integer, nullable= False)
     ticket_package_price= Column(Integer, default=0)
     created_at= Column(DateTime, default= datetime.now())
-    # seat_id= relationship('Seat', backref='ticket', lazy=True)
+    #seat_id= relationship('Seat', backref='ticket', lazy=True, uselist=False)
 
 class Seat(BaseModel):
     __table_args__= {'extend_existing': True}
@@ -129,7 +129,7 @@ def user_load(user_id):
 
 if __name__=="__main__":
     with app.app_context():
-       # db.create_all()
+       #db.create_all()
        pass
         # a1 = AirPort(name="Tân Sơn Nhất")
         # a2 = AirPort(name="Nội Bài")

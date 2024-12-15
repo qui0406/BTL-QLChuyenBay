@@ -10,6 +10,7 @@ const price_type_2= document.querySelector('#price_type_2')
 const quantity_1st_ticket= document.querySelector('#quantity-1st-ticket')
 const quantity_2nd_ticket= document.querySelector('#quantity-2nd-ticket')
 const inpR = document.querySelectorAll("form input[required]")
+const dataList = document.querySelector('datalist#airports')
 
 function addBetweenAirport(max) {
     const airportBetween= document.querySelectorAll('.airport-between')
@@ -34,7 +35,7 @@ function addBetweenAirport(max) {
         airportBetween[currentLength].insertAdjacentHTML('afterend', html )
         btnAddBwAirport.innerHTML = `Thêm sân bay trung gian (Còn lại ${max - currentLength - 1})`
     }else{
-        alert('Vượt quá quy định số sân bay trung gian')
+        Swal.fire("Lỗi", "Vượt quá quy định số sân bay trung gian!", "error")
     }
 }
 
@@ -47,36 +48,60 @@ function validateDatetime(datetime) {
     return true
 }
 
+function checkMinTimeFly(dStart, dEnd) {
+    const res = dEnd.getTime() - dStart.getTime()
+    return res / (1000 * 60) >= parseFloat(dataList.dataset.mintimefly)
+}
+
+function checkTimeStay(min, max) {
+    let error = true
+    airportBetween.forEach(ab => {
+        const ap_stay = ab.querySelector("div:nth-child(2) > input").value
+        if (parseFloat(ap_stay) > max || parseFloat(ap_stay) < min) {
+            error = false
+        }
+    })
+    return error
+}
+
+
 function getData(){
-//    const checkTime= validateDateTime(new Date(start.value)) &&
-//         new Date(end.time).getTime() - new Date(start.value).getTime()
-//
-//    const checkAirport= da.value && da.value=== aa.value
-//
-//    inpR.forEach(inp => {
-//       if (!inp.value) {
-//           inp.focus()
-//           return Swal.fire("Lỗi", "Vui lòng điền đầy đủ thông tin!", "error");
-//       }
-//    })
-//
-//    return Swal.fire("Lỗi", "Vui lòng chọn lại chuyến bay phù hợp", "error");
-//    }
-//
-//    if (checkTime <= 0) {
-//       return Swal.fire("Lỗi", "Thời gian không hợp lệ", "error");
-//    }    if (checkAirport) {
-//       return Swal.fire("Lỗi", "Vui lòng chọn lại chuyến bay phù hợp", "error");
-//    }
-//
-//    if (checkTime <= 0) {
-//       return Swal.fire("Lỗi", "Thời gian không hợp lệ", "error");
-//    }
+    const min = parseFloat(dataList.dataset.mintimestay)
+    const max = parseFloat(dataList.dataset.maxtimestay)
 
+    const checkTime =   validateDatetime(new Date(start.value))
+                        && new Date(end.value).getTime() - new Date(start.value).getTime()
+    const checkAirport = da.value && da.value === aa.value
 
-    const airportBetween= document.querySelectorAll('.airport-between')
+    inpR.forEach(inp => {
+        if (!inp.value) {
+            inp.focus()
+            return Swal.fire("Lỗi", "Vui lòng điền đầy đủ thông tin!", "error");
+        }
+    })
+
+    if(!price_type_1.value || !price_type_2){
+        return Swal.fire("Lỗi", "Vui lòng điền đầy đủ thông tin!", "error");
+    }
+
+    if (checkAirport) {
+        return Swal.fire("Lỗi", "Bạn đang phí tiền bay về 1 chỗ!", "error");
+    }
+
+    if (checkTime <= 0) {
+        return Swal.fire("Lỗi", "Thời gian không hợp lệ", "error");
+    }
+
+    if (!checkMinTimeFly(new Date(start.value), new Date(end.value))) {
+        return Swal.fire("Lỗi", `Thời gian tối thiểu của chuyến bay là ${(dataList.dataset.mintimefly)} phút!`, "error");
+    }
+
     let airportBetweenList=[]
     let check= false
+
+    if (!checkTimeStay(min, max)) {
+        return Swal.fire("Lỗi", `Thời gian dừng phải trong khoảng ${min} - ${max} phút !`, "error");
+    }
 
     airportBetween.forEach((ab, index)=>{
        const ap_id = ab.querySelector("div:first-child > input").value
@@ -115,17 +140,44 @@ function getData(){
         })
         .then(res => res.json())
         .then(data => {
-            Swal.fire({
+            if(data.status==200){
+              Swal.fire({
               position: "top-end",
               icon: "success",
-              title: "Your work has been saved",
+              title: "Lưu thành công",
               showConfirmButton: false,
               timer: 1500});
             location.reload()
+            }
+            if(data.status==500){
+               return Swal.fire("Lỗi", "Tuyến bay không có sẵn!", "error");
+            }
         })
         .catch(error => {
             console.error(error);
         });
+}
+
+function openModal() {
+  document.getElementById("myModal").style.display = "block";
+}
+
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
 }
 
 function btnDetails(flight_schedule_id){

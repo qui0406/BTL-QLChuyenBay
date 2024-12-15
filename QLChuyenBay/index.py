@@ -151,12 +151,15 @@ def save_route_flight():
     arrival_airport= data.get('arrival_airport')
 
     if departure_airport and arrival_airport:
-        fr= dao.add_route_flight(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
+        route_exists= dao.check_route_exists(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
                                         arrival_airport_id= dao.get_id_by_name_airport(arrival_airport))
-        return {
-            'status': 200,
-            'data': 'success'
-        }
+        if not route_exists:
+            fr= dao.add_route_flight(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
+                                            arrival_airport_id= dao.get_id_by_name_airport(arrival_airport))
+            return {
+                'status': 200,
+                'data': 'success'
+            }
     return {
         'status': 500,
         'data': 'error'
@@ -189,6 +192,7 @@ def create_flight_schedule():
     airport_between_list= data.get('airportBetweenList')
 
     try:
+
         f = dao.create_flight_sche(depart_airport=depart_airport,
                                    arrival_airport=arrival_airport,
                                    time_start=time_start,
@@ -197,20 +201,25 @@ def create_flight_schedule():
                                    quantity_2nd_ticket=quantity_2nd_ticket,
                                    price_type_1= price_type_1,
                                    price_type_2= price_type_2)
+        # if f['status'].__eq__('500'):
+        #     return {
+        #         'status': 500,
+        #         'data': 'Tuyến bay không tồn tại'
+        #     }
         for i in airport_between_list:
             bwa= dao.create_between_airport(airport_id=int(i['ap_id']),
                                             flight_sche_id=int(f.id),
                                             time_stay=float(i['ap_stay']),
                                             note=i['ap_note'])
     except Exception as err:
-        return jsonify({
+        return {
             'status': 500,
             'data': err
-        })
-    return jsonify({
+        }
+    return {
         'status': 200,
         'data': 'success'
-    })
+    }
 
 @app.route('/api/flight-schedule/details-schedule', methods=['post'])
 def get_data_details_schedule():
@@ -273,6 +282,9 @@ def get_ticket(flight_id):
     ticket_type= request.args.get('ticket-type')
     f = dao.get_flight_sche_json(flight_id)
     seat_active= dao.get_seat_number_active(flight_id)
+
+    import pdb
+    pdb.set_trace()
     return render_template('ticket.html',ticket_type=ticket_type, f=f,
                            user_role=UserRole, seat_active= seat_active)
 
@@ -280,8 +292,9 @@ def get_ticket(flight_id):
 def momo_ipn():
     pass
 
-@app.route('/bill_ticket/<int:user_id>')
-def bill_ticket(user_id):
+@app.route('/bill_ticket/<int:f_id>')
+def bill_ticket(f_id):
+    user_id= current_user.get_id()
     ticket_list_json=dao.get_ticket_list_json(user_id= user_id)
     return render_template('billTicket.html', ticket_list_json= ticket_list_json)
 
@@ -351,7 +364,7 @@ def create_checkout_session(f_id):
         ticket_type = session['ticket']['ticket_type']
         data_customer= session['ticket']['customers_info'][0]['data']
         number_customer= len(data_customer)
-        ticket_price= (int(session['ticket']['total']) - int(package_price)*number_customer)/ number_customer
+        ticket_price= (int(session['ticket']['total']) - int(package_price))/ number_customer
         for d in data_customer:
             cr = dao.create_ticket(user_id=user_id, flight_id=flight_id, customer_id= d['id'], ticket_price= ticket_price,
                                    ticket_type=ticket_type, package_price=package_price, customer_email= d['id_customer'],

@@ -1,5 +1,6 @@
 
 
+
 const addBtn = document.querySelector('#add-customer')
 const subBtn = document.querySelector('#sub-customer')
 const price = document.querySelector('.price span')
@@ -184,39 +185,3 @@ btnAccept.onclick=(e)=>{
 }
 
 
-
-////
-
-//
-//
-//
-//
-//
-//    .then(data => {
-//        if (data.status == 200 && (submitBtn.dataset.user == 'UserRole.STAFF' || submitBtn.dataset.user == 'UserRole.ADMIN')) {
-//            const inputList = document.querySelectorAll('form input')
-//            Array.from(inputList).forEach(inp => inp.value=null)
-//            select.value=0
-//            price.innerHTML = new Intl.NumberFormat().format(parseInt(price.dataset.price))
-////            return Swal.fire({
-////              title: 'Đặt vé thành công. Bạn có muốn đến trang xem vé?',
-////              showDenyButton: true,
-////              confirmButtonText: 'Có',
-////              denyButtonText: "Tiếp tục đặt vé",
-////            }).then((result) => {
-////              if (result.isConfirmed) {
-////              }
-////            })
-//
-//        }
-//        if (data.status == 200) {
-//            window.location.href = "/pay/" + data.data
-//        }
-//        if (data.status == 500) {
-//            Swal.fire("Lỗi", data.data, "error")
-//        }
-//    })
-//    .catch(err => {
-//        Swal.fire("Lỗi", err.data, "error")
-//    })
-//}
