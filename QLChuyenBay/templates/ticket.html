@@ -125,7 +125,7 @@
     <h1  class="text text-success text-center">Chọn ghế</h1>
     <form style="width:50%; margin: 0 auto;">
 
-        {%for x in range(1, 200, 6)%}
+        {%for x in range(0, 199, 6)%}
         <div class="d-flex justify-content-between">
             <div>
                 <input class="seat" style="width:45px; height:30px;" type="checkbox" id="check{{x}}"
@@ -144,7 +144,7 @@
                        name="seat{{x+5}}">
             </div>
         </div>
-        {%if x== 97%}
+        {%if x== 96%}
         <br><br>
         {%endif%}
 

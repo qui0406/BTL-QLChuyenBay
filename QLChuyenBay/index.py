@@ -273,13 +273,17 @@ def flight_list():
 def get_ticket(flight_id):
     ticket_type= request.args.get('ticket-type')
     f = dao.get_flight_sche_json(flight_id)
+    # user_id= current_user.get_id()
+    # data_customers= session['ticket']['customers_info'][0]['data']
+    # quantity_customers= session['ticket']['customers_info'][0]['quantity']
+    #
+    # name_customer= []
+    # for name in range(0, quantity_customers):
+    #     name_customer.append(data_customers[name]['name'])
+    # ticket_id= dao.get_list_id_ticket(session['ticket']['f_id'], name_customer, user_id)
     seat_active= dao.get_seat_number_active(flight_id)
     return render_template('ticket.html',ticket_type=ticket_type, f=f,
                            user_role=UserRole, seat_active= seat_active)
-
-@app.route('/api/momo_ipn', methods=['post'])
-def momo_ipn():
-    pass
 
 @app.route('/bill_ticket/<int:f_id>')
 def bill_ticket(f_id):
@@ -294,6 +298,7 @@ def create_ticket(f_id):
     id = data.get('f_id')
     type_ticket= data.get('ticket_type')
     session['ticket']= data
+
     remain_ticket=dao.get_ticket_remain(id, type_ticket)
 
     if remain_ticket < data['customers_info'][0]['quantity']:

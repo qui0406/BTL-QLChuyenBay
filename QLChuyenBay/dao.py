@@ -310,6 +310,9 @@ def save_seat_number(seat_number, ticket_id, flight_sche_id):
     db.session.commit()
     return s
 
+def count_ticket():
+    return Ticket.query.count()
+
 def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_name, customer_phone,
                   customer_email, customer_id, user_id, seat_number):
     f = FlightSchedule.query.filter(FlightSchedule.id.__eq__(flight_id), FlightSchedule.i_act.__eq__(True),
@@ -323,8 +326,8 @@ def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_
                ticket_type=ticket_type, ticket_price= ticket_price, ticket_package_price= package_price, created_at=datetime.datetime.now())
     db.session.add(t)
     db.session.commit()
-    ticket_id= Ticket.query.filter(Ticket.author_id.__eq__(user_id) and Ticket.customer_id.__eq__(customer_id)).first().id
-    s = save_seat_number(seat_number=seat_number, ticket_id=ticket_id, flight_sche_id= flight_id)
+
+    s = save_seat_number(seat_number=seat_number, ticket_id= count_ticket(), flight_sche_id= flight_id)
     db.session.add(cus, s)
     db.session.commit()
     return {
@@ -332,6 +335,21 @@ def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_
         "ticket": t,
         'seat': s
     }
+
+def get_id_ticket(flight_sche_id, customer_id, author_id):
+    return Ticket.query.filter(Ticket.flight_sche_id.__eq__(flight_sche_id),
+                               Ticket.customer_id.__eq__(customer_id),
+                               Ticket.author_id.__eq__(author_id)).first().id
+
+def get_list_id_ticket(flight_sche_id, customers, author_id):
+    arr_id_ticket=[]
+    for customer_id in customers:
+        id_ticket= get_id_ticket(flight_sche_id, customer_id, author_id)
+        arr_id_ticket.append(id_ticket)
+    return arr_id_ticket
+
+def get_id_ticket_latest(id):
+    return Ticket.query.get(id).first().id
 
 def get_seat_number_active(f_id):
     seat_arr=[]
