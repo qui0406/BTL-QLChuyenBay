@@ -107,7 +107,7 @@ const userChooseSeatNumber=[]
 //                return Swal.fire("Lỗi", "Vui lòng chọn đúng số lượng ghế!", "error")
 //            }
             if(seatNumber.checked){
-                userChooseSeatNumber.push(seatNumber.id)
+                userChooseSeatNumber.push(index)
             }
         }
     })

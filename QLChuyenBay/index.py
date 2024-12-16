@@ -274,7 +274,6 @@ def get_ticket(flight_id):
     ticket_type= request.args.get('ticket-type')
     f = dao.get_flight_sche_json(flight_id)
     seat_active= dao.get_seat_number_active(flight_id)
-
     return render_template('ticket.html',ticket_type=ticket_type, f=f,
                            user_role=UserRole, seat_active= seat_active)
 

@@ -118,7 +118,7 @@ class Ticket(BaseModel):
 
 class Seat(BaseModel):
     __table_args__= {'extend_existing': True}
-    seat_number= Column(Integer, nullable=False, unique= True)
+    seat_number= Column(Integer, nullable=False)
     flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id), nullable= False)
     ticket_id= Column(Integer, ForeignKey(Ticket.id), nullable= False)
     is_active= Column(Boolean, default= False)
