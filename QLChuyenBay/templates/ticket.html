@@ -123,8 +123,57 @@
         </div>
     </div>
 </div>
+
+<br><br><br>
+<div style="width:80%; margin: 0 auto;">
+    <h1  class="text text-success text-center">Chọn ghế</h1>
+    <form style="width:50%; margin: 0 auto;">
+
+        {%for x in range(1, 200, 6)%}
+        <div class="d-flex justify-content-between">
+            <div>
+                <input class="seat" style="width:45px; height:30px;" type="checkbox" id="{{x}}"
+                       name="seat{{x}}">
+                <input class="seat" style="width:45px; height:30px;"  type="checkbox" id="{{x+1}}"
+                       name="seat{{x}}">
+                <input class="seat" style="width:45px; height:30px;"  type="checkbox" id="{{x+2}}"
+                       name="seat{{x}}">
+            </div>
+            <div>
+                <input class="seat" style="width:45px; height:30px;"  type="checkbox" id="{{x+3}}"
+                       name="seat{{x}}">
+                <input class="seat" style="width:45px; height: 30px;"  type="checkbox" id="{{x+4}}"
+                       name="seat{{x}}">
+                <input class="seat" style="width:45px; height: 30px;" type="checkbox" id="{{x+5}}"
+                       name="seat{{x}}">
+            </div>
+        </div>
+        {%if x== 97%}
+        <br><br>
+        {%endif%}
+
+        {%endfor%}
+        <div>
+            {%if current_user.is_authenticated%}
+            <button id="accept_ticket" class="btn btn-primary mx-2 w-100">
+                Xác nhận đặt vé
+            </button>
+            {%else%}
+            <a href="{{ url_for('user_login', next=request.url) }}" class="btn btn-warning mx-2 w-100">Đăng nhập để xác nhận đặt vé</a>
+            {%endif%}
+        </div>
+    </form>
+</div>
 {% block js %}
+<script>
+   {%for s in seat_active%}
+        const seatId{{s}}= document.getElementById('{{s}}')
+        seatId{{s}}.checked= isChecked
+        seatId{{s}}.disable= isReadonly
+   {%endfor%}
+</script>
 <script defer src="{{ url_for('static', filename='js/ticket.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}
 {% endblock %}
+

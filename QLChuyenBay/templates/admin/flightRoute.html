@@ -1,12 +1,12 @@
 {% extends 'admin/base.html'%}
 
 {%block body%}
-<h1 class="text text-center text-success">QUẢN LÝ TUYẾN BAY</h1>
+<h1 class="text text-center">QUẢN LÝ TUYẾN BAY</h1>
 
 <form action="javascript:;">
     <div class="d-flex justify-content-around">
         <div class="row mt-3">
-            <label for="departure" class="form-label">Choose your browser from the list:</label>
+            <label for="departure" class="form-label">Chọn sân bay đi</label>
             <input class="form-control" list="ldeparture" name="departure" id="departure">
             <datalist id="ldeparture">
                 {%for i in list_airport%}
@@ -15,7 +15,7 @@
             </datalist>
         </div>
         <div class="row mt-3">
-            <label for="arrival" class="form-label">Chọn tuyến bay đến:</label>
+            <label for="arrival" class="form-label">Chọn sân bay đến</label>
             <input class="form-control" list="larrival" name="arrival" id="arrival">
             <datalist id="larrival">
                 {%for i in list_airport%}

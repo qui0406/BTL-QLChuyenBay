@@ -2,7 +2,8 @@
 
 {%block body%}
 
-<form action="javascript:;">
+<form class="rounded shadow-lg p-5" action="javascript:;">
+    <h2 class="text-center">LẬP LỊCH CHUYẾN BAY</h2>
     <div class="row my-4">
         <div class="col-lg-6">
             <label for="departure_airport_sche" class="form-label">Sân bay đi:</label>
@@ -55,7 +56,7 @@
             <input name="price_type_2" type="number" class="form-control" id="price_type_2">
         </div>
     </div>
-    <div class="row airport-between">
+    <div class="row airport-between align-items-end">
         <div class="col-lg-3">
             <label for="airport-bw" class="form-label">Sân bay trung gian:</label>
             <input name="airport_bw" type="text" class="form-control" id="airport-bw">
@@ -64,9 +65,12 @@
             <label for="airport-bw-stay" class="form-label">Thời gian dừng (giờ):</label>
             <input name="airport_bw_stay" min="0" type="number" class="form-control" id="airport-bw-stay">
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-5">
             <label for="airport-bw-note" class="form-label">Ghi chú:</label>
             <input name="airport_bw_note" type="text" class="form-control" id="airport-bw-note">
+        </div>
+        <div class="col-lg-1 text-end">
+            <button type="button" class="btn btn-danger"> - </button>
         </div>
     </div>
     <div class="d-flex justify-content-end gap-2 mt-4">
@@ -76,7 +80,7 @@
         </div>
         <button type="submit" onclick="getData()" class="btn btn-success submit-btn">Tạo lịch chuyến bay</button>
     </div>
-
+</div>
 </form>
 <h3 class="my-3">LỊCH CHUYẾN BAY ĐÃ TẠO</h3>
 <table class="table mt-4">
@@ -96,7 +100,7 @@
         <th>{{f.time_start}}</th>
         <th>{{f.time_end}}</th>
         <th>
-            <button  onclick="btnDetails({{f.id}})" class="btn btn-primary btn-details">Xem chi tiết</button>
+            <button onclick="btnDetails({{f.id}})" class="btn btn-primary btn-details">Xem chi tiết</button>
         </th>
     </tr>
     {%endfor%}

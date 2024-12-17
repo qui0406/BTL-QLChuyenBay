@@ -3,46 +3,56 @@
 {%block body%}
 
 
-<h1 class="text text-center text-success">QUẢN LÝ QUY ĐỊNH</h1>
+<h1 class="text text-center">QUẢN LÝ QUY ĐỊNH</h1>
 
-<form method="POST" action="{{url_for('save_admin_rules')}}">
-     <h3 class="text text-success">Quy định về chuyến bay</h3>
-    <div class="row mt-3">
-        <label for="min-time-flight" class="form-label">Qui định thời gian bay tối thiểu: (phút)</label>
-        <input type="number" class="form-control" value="{{ admin_rules.min_time_flight }}" id="min-time-flight"  name="min-time-flight">
+<form method="POST" action="{{url_for('save_admin_rules')}}" class="shadow-lg border-1 rounded p-5">
+     <h3 class="text-center">Quy định về chuyến bay</h3>
+    <div class="row g-3">
+    <div class="col-md-6">
+        <label for="min-time-flight" class="form-label">Quy định thời gian bay tối thiểu: (phút)</label>
+        <input type="number" class="form-control" value="{{ admin_rules.min_time_flight }}" id="min-time-flight" name="min-time-flight">
     </div>
-    <div class="row mt-3">
-        <label for="max_quantity_between_airport" class="form-label">Qui định số sân bay trung gian tối đa:</label>
-        <input type="number" class="form-control" value="{{ admin_rules.max_quantity_between_airport }}" id="max_quantity_between_airport"  name="max_quantity_between_airport">
+    <div class="col-md-6">
+        <label for="max_quantity_between_airport" class="form-label">Quy định số sân bay trung gian tối đa:</label>
+        <input type="number" class="form-control" value="{{ admin_rules.max_quantity_between_airport }}" id="max_quantity_between_airport" name="max_quantity_between_airport">
     </div>
-    <div class="row mt-3">
-        <label for="min_time_stay_airport" class="form-label">Qui định thời gian nghĩ nhanh nhất: (phút)</label>
-        <input type="number" class="form-control" value="{{ admin_rules.min_time_stay_airport }}" id="min_time_stay_airport"  name="min_time_stay_airport">
+</div>
+<div class="row g-3 mt-3">
+    <div class="col-md-6">
+        <label for="min_time_stay_airport" class="form-label">Quy định thời gian dừng tối thiểu: (phút)</label>
+        <input type="number" class="form-control" value="{{ admin_rules.min_time_stay_airport }}" id="min_time_stay_airport" name="min_time_stay_airport">
     </div>
-    <div class="row mt-3">
-        <label for="max_time_stay_airport" class="form-label">Qui định thời gian nghĩ lâu: (phút)</label>
-        <input type="number" class="form-control" value="{{ admin_rules.max_time_stay_airport }}" id="max_time_stay_airport"  name="max_time_stay_airport">
+    <div class="col-md-6">
+        <label for="max_time_stay_airport" class="form-label">Quy định thời gian dừng tối đa: (phút)</label>
+        <input type="number" class="form-control" value="{{ admin_rules.max_time_stay_airport }}" id="max_time_stay_airport" name="max_time_stay_airport">
     </div>
+</div>
+
     <br>
-     <h3 class="text text-success">Quy định về vé</h3>
-    <div class="row mt-3">
-        <label for="time_book_ticket" class="form-label">Qui định thời gian đặt vé: (giờ)</label>
-        <input type="number" value="{{ admin_rules.time_book_ticket }}" class="form-control" id="time_book_ticket"  name="time_book_ticket">
+     <h3 class="text-center">Quy định về vé</h3>
+   <div class="row g-3">
+    <div class="col-md-6">
+        <label for="time_book_ticket" class="form-label">Quy định thời gian đặt vé: (giờ)</label>
+        <input type="number" value="{{ admin_rules.time_book_ticket }}" class="form-control" id="time_book_ticket" name="time_book_ticket">
     </div>
-    <div class="row mt-3">
-        <label for="time_buy_ticket" class="form-label">Qui định thời gian mua vé: (giờ)</label>
-        <input type="number" class="form-control" value="{{ admin_rules.time_buy_ticket }}" id="time_buy_ticket"  name="time_buy_ticket">
+    <div class="col-md-6">
+        <label for="time_buy_ticket" class="form-label">Quy định thời gian mua vé: (giờ)</label>
+        <input type="number" class="form-control" value="{{ admin_rules.time_buy_ticket }}" id="time_buy_ticket" name="time_buy_ticket">
     </div>
-    <div class="row mt-3">
+</div>
+<div class="row g-3 mt-3">
+    <div class="col-md-6">
         <label for="ticket1_quantity" class="form-label">Số lượng vé loại 1:</label>
-        <input type="number" class="form-control" id="ticket1_quantity"  name="ticket1_quantity">
+        <input type="number" class="form-control" id="ticket1_quantity" name="ticket1_quantity">
     </div>
-    <div class="row mt-3">
+    <div class="col-md-6">
         <label for="ticket2_quantity" class="form-label">Số lượng vé loại 2:</label>
-        <input type="number" class="form-control" id="ticket2_quantity"  name="ticket2_quantity">
+        <input type="number" class="form-control" id="ticket2_quantity" name="ticket2_quantity">
     </div>
-    <div class="row mt-3">
-        <button type="submit" class="btn btn-danger">Xác nhận thay đổi quy định</button>
+</div>
+
+    <div class="row mt-3 d-flex justify-content-center mt-3">
+        <button type="submit" class="btn btn-success text-center">Xác nhận thay đổi quy định</button>
     </div>
 </form>
 <br><br>
