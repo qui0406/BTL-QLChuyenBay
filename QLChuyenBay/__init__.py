@@ -6,11 +6,11 @@ import cloudinary
 from flask_login import LoginManager
 from flask_mail import *
 from flask_principal import Principal
-from urllib.parse import quote
 import stripe
 
+
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/qlchuyenbay?charset=utf8mb4" % quote("Tphus@2102")
+app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:12345678@localhost/qlchuyenbay?charset=utf8mb4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
 app.secret_key='jiugyvIU*YGUFT*&&^T&GUHBOHIGY&(*)(U*HIJBHVFYFY%^&^&^&(*)*YUGBHOIB48451'
 
@@ -20,11 +20,16 @@ app.config["MAIL_USERNAME"]='anhqui04062004@gmail.com'
 app.config["MAIL_PASSWORD"]='hsesebwdzpkqnzna'
 app.config["MAIL_USE_TLS"]= True
 
+app.config['MY_DOMAIN']= 'http://localhost:5002'
+
 cloudinary.config(
     cloud_name= 'do43r8nr0',
     api_key='947875495844325',
     api_secret= 'evQEPk5TbxIMpCWbbXl8sLMbo6A'
 )
+
+stripe.api_key= 'sk_test_51QVbF6GdmuuxpPW1WKDGv0LbqFP9D7ilJcLKa2jLf5tE0r6TkWteM0GTeLTsGjHU3oaB3tHFNbydVhhdOyZmFdaX00BJJPujHJ'
+endpoint_secret= 'whsec_wRNftLajMZNeslQOP6vEPm4iVx5NlZ6z'
 
 otp= randint(000000, 999999)
 mail=Mail(app=app)

@@ -14,13 +14,18 @@ function addRoute(){
         }
     }).then(res=>res.json())
     .then(data=>{
-        Swal.fire({
+        if(data.status==200){
+            Swal.fire({
               position: "top-end",
               icon: "success",
-              title: "Your work has been saved",
+              title: "Bạn đã lưu thành công!",
               showConfirmButton: false,
               timer: 1500});
-        location.reload()
+            location.reload()
+        }
+        if(data.status==500){
+            Swal.fire("Lỗi", "Tuyến bay đã tồn tại! Vui lòng chọn tuyến khác!", "error")
+        }
     }).catch(err=>{
         console.error(err)
     })
@@ -28,13 +33,13 @@ function addRoute(){
 
 function deleteRoute(id){
     return Swal.fire({
-          title: "Are you sure?",
-          text: "You won't be able to revert this!",
+          title: "Bạn có chắc chắn muốn xóa tuyến bay này?",
+          text: "Không thể hoàn tác!",
           icon: "warning",
           showCancelButton: true,
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
-          confirmButtonText: "Yes, delete it!"
+          confirmButtonText: "OK!"
     }).then((result) => {
     if (result.isConfirmed) {
         fetch(`/api/delete-route/${id}`, {
@@ -56,8 +61,8 @@ function deleteRoute(id){
              console.error("Error deleting route:", err);
         });
             Swal.fire({
-                title: "Deleted!",
-                text: "Your file has been deleted.",
+                title: "Đã xóa!",
+                text: "Tuyến bay này đã được xóa.",
                 icon: "success"
             });
         }

@@ -1,6 +1,5 @@
 import stripe
-
-from QLChuyenBay import app, login, otp, mail
+from QLChuyenBay import app, login, otp, mail, endpoint_secret
 from flask import render_template, request, redirect, url_for, session, jsonify, json, request
 import dao
 import cloudinary.uploader
@@ -151,12 +150,15 @@ def save_route_flight():
     arrival_airport= data.get('arrival_airport')
 
     if departure_airport and arrival_airport:
-        fr= dao.add_route_flight(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
+        route_exists= dao.check_route_exists(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
                                         arrival_airport_id= dao.get_id_by_name_airport(arrival_airport))
-        return {
-            'status': 200,
-            'data': 'success'
-        }
+        if not route_exists:
+            fr= dao.add_route_flight(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
+                                            arrival_airport_id= dao.get_id_by_name_airport(arrival_airport))
+            return {
+                'status': 200,
+                'data': 'success'
+            }
     return {
         'status': 500,
         'data': 'error'
@@ -187,7 +189,6 @@ def create_flight_schedule():
     price_type_1= data.get('price_type_1')
     price_type_2= data.get('price_type_2')
     airport_between_list= data.get('airportBetweenList')
-
     try:
         f = dao.create_flight_sche(depart_airport=depart_airport,
                                    arrival_airport=arrival_airport,
@@ -203,14 +204,14 @@ def create_flight_schedule():
                                             time_stay=float(i['ap_stay']),
                                             note=i['ap_note'])
     except Exception as err:
-        return jsonify({
+        return {
             'status': 500,
             'data': err
-        })
-    return jsonify({
+        }
+    return {
         'status': 200,
         'data': 'success'
-    })
+    }
 
 @app.route('/api/flight-schedule/details-schedule', methods=['post'])
 def get_data_details_schedule():
@@ -272,16 +273,21 @@ def flight_list():
 def get_ticket(flight_id):
     ticket_type= request.args.get('ticket-type')
     f = dao.get_flight_sche_json(flight_id)
+    # user_id= current_user.get_id()
+    # data_customers= session['ticket']['customers_info'][0]['data']
+    # quantity_customers= session['ticket']['customers_info'][0]['quantity']
+    #
+    # name_customer= []
+    # for name in range(0, quantity_customers):
+    #     name_customer.append(data_customers[name]['name'])
+    # ticket_id= dao.get_list_id_ticket(session['ticket']['f_id'], name_customer, user_id)
     seat_active= dao.get_seat_number_active(flight_id)
     return render_template('ticket.html',ticket_type=ticket_type, f=f,
                            user_role=UserRole, seat_active= seat_active)
 
-@app.route('/api/momo_ipn', methods=['post'])
-def momo_ipn():
-    pass
-
-@app.route('/bill_ticket/<int:user_id>')
-def bill_ticket(user_id):
+@app.route('/bill_ticket/<int:f_id>')
+def bill_ticket(f_id):
+    user_id= current_user.get_id()
     ticket_list_json=dao.get_ticket_list_json(user_id= user_id)
     return render_template('billTicket.html', ticket_list_json= ticket_list_json)
 
@@ -292,6 +298,7 @@ def create_ticket(f_id):
     id = data.get('f_id')
     type_ticket= data.get('ticket_type')
     session['ticket']= data
+
     remain_ticket=dao.get_ticket_remain(id, type_ticket)
 
     if remain_ticket < data['customers_info'][0]['quantity']:
@@ -349,15 +356,45 @@ def create_checkout_session(f_id):
         flight_id = session['ticket']['f_id']
         package_price = session['ticket']['package_price']
         ticket_type = session['ticket']['ticket_type']
-        data_customer= session['ticket']['customers_info'][0]['data']
-        number_customer= len(data_customer)
-        ticket_price= (int(session['ticket']['total']) - int(package_price)*number_customer)/ number_customer
-        for d in data_customer:
-            cr = dao.create_ticket(user_id=user_id, flight_id=flight_id, customer_id= d['id'], ticket_price= ticket_price,
-                                   ticket_type=ticket_type, package_price=package_price, customer_email= d['id_customer'],
-                                   customer_phone= d['phone'], customer_name= d['name'],
-                                   seat_number= d['seat_number'])
+        ticket_price= (int(session['ticket']['total']) - int(package_price))
+        for d in range(len(session['ticket']['customers_info'][0]['data'])):
+            cr = dao.create_ticket(user_id=user_id, flight_id=flight_id,
+                                   customer_id= session['ticket']['customers_info'][0]['data'][d]['id'],
+                                   ticket_price= ticket_price,
+                                   ticket_type=ticket_type, package_price=package_price,
+                                   customer_email=  session['ticket']['customers_info'][0]['data'][d]['id_customer'],
+                                   customer_phone=  session['ticket']['customers_info'][0]['data'][d]['phone'],
+                                   customer_name=  session['ticket']['customers_info'][0]['data'][d]['name'],
+                                   seat_number=  session['ticket']['customers_info'][0]['data'][d]['seat_number'])
+
     return redirect(checkout_session.url, code= 303)
+
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    payload = request.data
+    sig_header = request.headers['Stripe-Signature']
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except ValueError as e:
+        # Invalid payload
+        return 'Invalid payload', 400
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return 'Invalid signature', 400
+    if event['type'] == 'checkout.session.completed':
+        user_id = current_user.get_id()
+        email = dao.get_email_by_user(user_id)
+        session = event['data']['object']
+        msg = Message(subject='Thông báo về việc thanh toán vé máy bay PhuQuiAirFlight',
+                      sender='anhqui04062004@gmail.com', recipients=[email])
+        msg.body = ('Bạn đã thanh toán thành công: ' + str(session['ticket']['total']) +
+                    ' VND. Chúc bạn có một chuyến đi tốt lành')
+        mail.send(msg)
+    return 'succedd', 200
+
 
 @app.route('/error')
 def error():

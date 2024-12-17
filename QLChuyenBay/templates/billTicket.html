@@ -23,7 +23,7 @@
     </tr>
     <tr>
         <td>HẠNG VÉ: <span class="fw-bold">Vé hạng {{ t['ticket_type'] }}</span></td>
-        <td>GIÁ TIỀN: <span class="fw-bold">{{ t['ticket_price'] }} VND</span></td>
+        <td>GIÁ TIỀN: <span class="fw-bold">{{ t['ticket_price'] }} + {{t['ticket_package_price']}}/ {{ticket_list_json[0]['quantity']}} VND</span></td>
     </tr>
     <tr>
         <td colspan="2">THỜI GIAN ĐẶT VÉ: <span class="fw-bold">{{t['created_at']}}</span></td>

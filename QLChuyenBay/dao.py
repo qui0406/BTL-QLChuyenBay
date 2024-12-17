@@ -7,6 +7,7 @@ import re
 import locale
 locale.setlocale(locale.LC_ALL, 'vi_VN')
 
+#Them vao 1 tai khoan dang ky vao database
 def add_user(name, username, password, email, **kwarg):
     password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
     user = User(name = name, username = username, password = password,
@@ -19,17 +20,17 @@ def check_secure_password(password):
     if re.match(pattern, password):
         return True
 
+#Kiem tra tai khoan do co trong database hay khong
 def auth_user(username, password, role=UserRole.USER):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     return User.query.filter(User.username.__eq__(username.strip()),
                           User.password.__eq__(password)).first()
 
-
 def check_mail_exit(email):
     if email:
         return User.query.filter(User.email.__eq__(email)).first()
 
-
+#Cap nhat lai mat khau moi
 def override_password(email, password):
     password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
     user= User.query.filter(User.email.__eq__(email)).first()
@@ -37,29 +38,33 @@ def override_password(email, password):
         user.password= password
         db.session.commit()
 
-def get_id_by_name_airport(name):
 
-    return AirPort.query.filter(AirPort.name.__eq__(name)).first().id
-
-def get_rule_admin():
-    return Rule.query.order_by(Rule.created_at.desc()).first()
-
-def save_admin_rules(min_time_flight, max_quantity_between_airport, min_time_stay_airport, max_time_stay_airport,
-                     time_book_ticket,time_buy_ticket):
+#Luu quan ly quy dinh moi vao database
+def save_admin_rules(min_time_flight, max_quantity_between_airport, min_time_stay_airport,
+                     max_time_stay_airport, time_book_ticket,time_buy_ticket):
     sa= Rule(min_time_flight= min_time_flight,
              max_quantity_between_airport= max_quantity_between_airport,
              min_time_stay_airport= min_time_stay_airport,
              max_time_stay_airport= max_time_stay_airport,
-             time_book_ticket= time_book_ticket
-             ,time_buy_ticket= time_buy_ticket)
+             time_book_ticket= time_book_ticket,
+             time_buy_ticket= time_buy_ticket)
     db.session.add(sa)
     db.session.commit()
     return sa
 
+def get_rule_admin():
+    return Rule.query.order_by(Rule.created_at.desc()).first()
+
+def get_email_by_user(id):
+    return User.query.filter(User.id.__eq__(id)).first().email
+
+def get_id_by_name_airport(name):
+    return AirPort.query.filter(AirPort.name.__eq__(name)).first().id
 
 def get_air_port_list():
     return AirPort.query.filter().all()
 
+#Them tuyen bay
 def add_route_flight(departure_airport_id, arrival_airport_id):
     if departure_airport_id and arrival_airport_id:
         fr= FlightRoute(departure_airport_id= departure_airport_id,
@@ -77,6 +82,11 @@ def del_route_id(route_id):
     db.session.delete(fd)
     db.session.commit()
     return fd
+
+def check_route_exists(departure_airport_id, arrival_airport_id):
+    route_exist= FlightRoute.query.filter(FlightRoute.departure_airport_id.__eq__(departure_airport_id),
+                                          FlightRoute.arrival_airport_id.__eq__(arrival_airport_id)).all()
+    return route_exist
 
 def create_flight_sche(depart_airport, arrival_airport, time_start, time_end,
                        quantity_1st_ticket, quantity_2nd_ticket, price_type_1, price_type_2):
@@ -232,7 +242,7 @@ def get_quantity_ticket():
     type_2= FlightSchedule.ticket2_quantity
     return type_1 + type_2
 
-def get_ticket_json(t_id):
+def get_ticket_json(t_id, quantity):
     t = Ticket.query.filter(Ticket.id.__eq__(t_id)).first()
     c = Customer.query.filter(Customer.id.__eq__(t.id)).first()
     return {
@@ -244,15 +254,17 @@ def get_ticket_json(t_id):
         'ticket_package_price': t.ticket_package_price,
         'customer_name': c.customer_name,
         'customer_phone': c.customer_phone,
-        'customer_id': c.customer_id,
-        'created_at': t.created_at
+        'customer_id': c.id,
+        'created_at': t.created_at,
+        'quantity': quantity
     }
 
 def get_ticket_list_json(user_id):
     t_list = Ticket.query.filter(Ticket.author_id.__eq__(user_id)).order_by(Ticket.created_at.desc()).all()
+    quantity= len(t_list)
     t_list_json = []
     for t in t_list:
-        t_list_json.append(get_ticket_json(t.id))
+        t_list_json.append(get_ticket_json(t.id, quantity))
     return t_list_json
 
 
@@ -298,6 +310,9 @@ def save_seat_number(seat_number, ticket_id, flight_sche_id):
     db.session.commit()
     return s
 
+def count_ticket():
+    return Ticket.query.count()
+
 def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_name, customer_phone,
                   customer_email, customer_id, user_id, seat_number):
     f = FlightSchedule.query.filter(FlightSchedule.id.__eq__(flight_id), FlightSchedule.i_act.__eq__(True),
@@ -311,8 +326,8 @@ def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_
                ticket_type=ticket_type, ticket_price= ticket_price, ticket_package_price= package_price, created_at=datetime.datetime.now())
     db.session.add(t)
     db.session.commit()
-    ticket_id= Ticket.query.filter(Ticket.author_id.__eq__(user_id) and Ticket.customer_id.__eq__(customer_id)).first().id
-    s = save_seat_number(seat_number=seat_number, ticket_id=ticket_id, flight_sche_id= flight_id)
+
+    s = save_seat_number(seat_number=seat_number, ticket_id= count_ticket(), flight_sche_id= flight_id)
     db.session.add(cus, s)
     db.session.commit()
     return {
@@ -320,6 +335,21 @@ def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_
         "ticket": t,
         'seat': s
     }
+
+def get_id_ticket(flight_sche_id, customer_id, author_id):
+    return Ticket.query.filter(Ticket.flight_sche_id.__eq__(flight_sche_id),
+                               Ticket.customer_id.__eq__(customer_id),
+                               Ticket.author_id.__eq__(author_id)).first().id
+
+def get_list_id_ticket(flight_sche_id, customers, author_id):
+    arr_id_ticket=[]
+    for customer_id in customers:
+        id_ticket= get_id_ticket(flight_sche_id, customer_id, author_id)
+        arr_id_ticket.append(id_ticket)
+    return arr_id_ticket
+
+def get_id_ticket_latest(id):
+    return Ticket.query.get(id).first().id
 
 def get_seat_number_active(f_id):
     seat_arr=[]
