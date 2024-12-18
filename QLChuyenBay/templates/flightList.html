@@ -53,12 +53,12 @@
         <form action="javascript:;">
             <div class="d-flex">
                 <div style="margin: 5px;">
-                    <div id="type-1" class="mb-2" onclick="selectTicketType1(1, {{d.id}})">
+                    <div id="type-1" class="mb-2" onclick="selectTicketType1(1, {{d.id}}, '{{d.time_start}}')">
                         <a href="#"  class="btn w-100 btn-success">Vé hạng 1 chỉ từ {{ d.price_type_1 }}/ khách</a>
                     </div>
                 </div>
                 <div style="margin: 5px;">
-                    <div id="type-2" class="mb-2" onclick="selectTicketType2(2, {{d.id}})">
+                    <div id="type-2" class="mb-2" onclick="selectTicketType2(2, {{d.id}}, '{{d.time_start}}')">
                         <a href="#"  class="btn w-100 btn-success">Vé hạng 2 chỉ từ {{ d.price_type_2 }}/ khách</a>
                     </div>
                 </div>
@@ -88,7 +88,77 @@
 </div>
 {% endfor %}
 {% endif %}
-<script src="{{url_for('static', filename='js/flightList.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment-with-locales.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function checkTime(time_start){
+        const now = new Date();
+        const timeStart= new Date(time_start)
+
+        const timestamp = now.getTime();
+        const bookTicketTimestamp = timeStart.getTime();
+        return (bookTicketTimestamp - timestamp)/ (1000*60*60)
+    }
+
+function selectTicketType1(ticketType, flightId, time_start) {
+    event.preventDefault()
+    const timeStamp= checkTime(time_start) - 7
+
+    {%if current_user.is_authenticated%}
+        {%if current_user.user_role.value == 3%}
+            if( {{admin_rules.time_book_ticket}} > timeStamp ){
+                return Swal.fire("Lỗi", `Đã quá thời gian đặt vé. Vé chỉ còn cách thời gian bay khoảng ${Math.floor(timeStamp)} giờ!`, "error");
+            }else{
+                 window.location.href='/ticket/'+  flightId + '?ticket-type='+ticketType
+            }
+        {%elif current_user.user_role.value == 1 or current_user.user_role.value == 2%}
+            if( {{admin_rules.time_buy_ticket}} > timeStamp ){
+                return Swal.fire("Lỗi", `Đã quá thời gian bán vé. Vé chỉ còn cách thời gian bay khoảng ${Math.floor(timeStamp)} giờ!`, "error");
+            }else{
+                 window.location.href='/ticket/'+  flightId + '?ticket-type='+ticketType
+            }
+        {%endif%}
+    {%else%}
+        if( {{admin_rules.time_book_ticket}} > timeStamp ){
+              return Swal.fire("Lỗi", `Đã quá thời gian đặt vé. Vé chỉ còn cách thời gian bay khoảng ${Math.floor(timeStamp)} giờ!`, "error");
+        }else{
+              window.location.href='/ticket/'+  flightId + '?ticket-type='+ticketType
+        }
+    {%endif%}
+}
+
+
+  function selectTicketType2(ticketType, flightId, time_start) {
+    event.preventDefault()
+<!--        Lay theo gio chuan quoc te-->
+    const timeStamp= checkTime(time_start) - 7
+
+    {%if current_user.is_authenticated%}
+        {%if current_user.user_role.value == 3%}
+            if( {{admin_rules.time_book_ticket}} > timeStamp ){
+                return Swal.fire("Lỗi", `Đã quá thời gian đặt vé. Vé chỉ còn cách thời gian bay khoảng ${Math.floor(timeStamp)} giờ!`, "error");
+            }else{
+                 window.location.href='/ticket/'+  flightId + '?ticket-type='+ticketType
+            }
+        {%elif current_user.user_role.value == 1 or current_user.user_role.value == 2%}
+            if( {{admin_rules.time_buy_ticket}} > timeStamp ){
+                return Swal.fire("Lỗi", `Đã quá thời gian bán vé. Vé chỉ còn cách thời gian bay khoảng ${Math.floor(timeStamp)} giờ!`, "error");
+            }else{
+                 window.location.href='/ticket/'+  flightId + '?ticket-type='+ticketType
+            }
+        {%endif%}
+    {%else%}
+        if( {{admin_rules.time_book_ticket}} > timeStamp ){
+                return Swal.fire("Lỗi", `Đã quá thời gian đặt vé. Vé chỉ còn cách thời gian bay khoảng ${Math.floor(timeStamp)} giờ!`, "error");
+            }else{
+                 window.location.href='/ticket/'+  flightId + '?ticket-type='+ticketType
+            }
+    {%endif%}
+}
+
+</script>
+
 
 
 {% endblock %}

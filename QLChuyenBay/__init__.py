@@ -29,7 +29,7 @@ cloudinary.config(
 )
 
 stripe.api_key= 'sk_test_51QVbF6GdmuuxpPW1WKDGv0LbqFP9D7ilJcLKa2jLf5tE0r6TkWteM0GTeLTsGjHU3oaB3tHFNbydVhhdOyZmFdaX00BJJPujHJ'
-endpoint_secret= 'whsec_wRNftLajMZNeslQOP6vEPm4iVx5NlZ6z'
+endpoint_secret= 'whsec_ldgJn7UZz83pP87KLpAw5fkh8WT4hOJr'
 
 otp= randint(000000, 999999)
 mail=Mail(app=app)

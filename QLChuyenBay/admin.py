@@ -88,7 +88,11 @@ class RulesView(AuthenticatedAdminView):
 class StatsView(AuthenticatedAdminView):
     @expose('/')
     def index(self):
-        return self.render('admin/stats.html')
+        route_list = dao.get_route_list()
+        states_revenue= dao.get_revenue_stats_json_list()
+        states_ticket= dao.get_total_ticket_quantity_per_route()
+        return self.render('admin/stats.html', route_list= route_list,
+                           states_revenue= states_revenue, states_ticket= states_ticket)
 
 
 admin= Admin(app=app, name='Quản lý chuyến bay', template_mode='bootstrap4', index_view= MyAdminIndex())

@@ -17,18 +17,18 @@
         <th scope="col">Số ghế</th>
         <th scope="col">Loại vé</th>
     </tr>
-    {% for t in session['ticket']['customers_info'][0]['data'] %}
+    {% for t in range(quantity_customers) %}
     <tr>
-        <th>{{t.id}}</th>
-        <th>{{t.name}}</th>
-        <th>{{t.phone}}</th>
-        <th>{{t.id_customer}}</th>
-        <th>{{t.seat_number}}</th>
+        <th>{{quantity_ticket + t}}</th>
+        <th>{{data[t].name}}</th>
+        <th>{{data[t].phone}}</th>
+        <th>{{data[t].id_customer}}</th>
+        <th>{{data[t].seat_number}}</th>
         <th>Vé hạng {{session['ticket']['ticket_type']}}</th>
     </tr>
     {%endfor%}
 </table>
-    <h4 class="text text-center text-success">Tổng số tiền phải thanh toán: <span>{{session['ticket']['total']}}</span></h4>
+    <h4 class="text text-center text-success">Tổng số tiền phải thanh toán: <span id="price_total">{{session['ticket']['total']}} VNĐ</span></h4>
 
 <form action="/create-checkout-session/{{session['ticket']['f_id']}}" method="POST">
      <button type="submit" id="btn-checkout" class="btn btn-success">
@@ -45,8 +45,9 @@
     const payCashier= document.getElementById('btn-pay-cashier')
     payCashier.onclick=()=>{
         event.preventDefault()
-
         window.location.href='/bill_ticket/{{session['ticket']['f_id']}}'
     }
+
+
 </script>
 {%endblock%}

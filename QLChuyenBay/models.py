@@ -79,7 +79,8 @@ class FlightSchedule(BaseModel):
     ticket2_book_quantity= Column(Integer, default= 0)
     price_type_1= Column(Float, default=0)
     price_type_2= Column(Float, default=0)
-   # bw_airports = relationship('BetweenAirport', backref='flight_schedules', lazy= True)
+    created_date = Column(DateTime, default=datetime.now())
+    # bw_airports = relationship('BetweenAirport', backref='flight_schedules', lazy= True)
 
     def __str__(self):
         return str(self.id)
@@ -120,7 +121,7 @@ class Seat(BaseModel):
     __table_args__= {'extend_existing': True}
     seat_number= Column(Integer, nullable=False)
     flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id), nullable= False)
-    ticket_id= Column(Integer, ForeignKey(Ticket.id), nullable= False, unique= True)
+    ticket_id= Column(Integer, ForeignKey(Ticket.id), nullable= False)
     is_active= Column(Boolean, default= False)
 
 
@@ -130,8 +131,9 @@ def user_load(user_id):
 
 if __name__=="__main__":
     with app.app_context():
-       db.create_all()
-       pass
+       #db.create_all()
+        pass
+        #
         # a1 = AirPort(name="Tân Sơn Nhất")
         # a2 = AirPort(name="Nội Bài")
         # a3 = AirPort(name="Côn Đảo")
@@ -145,6 +147,6 @@ if __name__=="__main__":
         #
         # db.session.add_all([a1, a2, a3, a4, a5, a6, a7, a8, a9, a10])
         # db.session.commit()
-        # a = Rule()
+        # # a = Rule()
         # db.session.add(a)
         # db.session.commit()
