@@ -43,6 +43,7 @@ class Rule(BaseModel):
     time_book_ticket= Column(Float, default= 12)
     time_buy_ticket= Column(Float, default= 4)
     created_at= Column(DateTime, default= datetime.now())
+    author_id= Column(Integer, ForeignKey(User.id))
 
 class AirPort(BaseModel):
     __table_args__ = {'extend_existing': True}
@@ -133,7 +134,7 @@ if __name__=="__main__":
     with app.app_context():
        #db.create_all()
         pass
-        #
+        # #
         # a1 = AirPort(name="Tân Sơn Nhất")
         # a2 = AirPort(name="Nội Bài")
         # a3 = AirPort(name="Côn Đảo")
@@ -147,6 +148,6 @@ if __name__=="__main__":
         #
         # db.session.add_all([a1, a2, a3, a4, a5, a6, a7, a8, a9, a10])
         # db.session.commit()
-        # # a = Rule()
+        # a = Rule()
         # db.session.add(a)
         # db.session.commit()

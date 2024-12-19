@@ -5,18 +5,7 @@ import dao
 import cloudinary.uploader
 from flask_login import login_user, logout_user, login_required
 from flask_mail import *
-import pdb
 
-from datetime import datetime
-from sqlalchemy.ext.declarative import declarative_base
-
-from QLChuyenBay.models import Customer
-#from QLChuyenBay.dao import remain_ticket
-from models import UserRole
-
-# @app.errorhandler(404)
-# def page_not_found(error):
-#     return render_template('page_not_found.html')
 
 @app.route("/")
 def home():
@@ -119,7 +108,6 @@ def user_logout():
 
 @app.route('/api/admin-rule', methods=['post'])
 def save_admin_rules():
-    #data=request.get_json()
     min_time_flight = request.form.get('min-time-flight'),
     max_quantity_between_airport = request.form.get('max_quantity_between_airport'),
     min_time_stay_airport = request.form.get('min_time_stay_airport'),
@@ -177,6 +165,11 @@ def delete_route(route_id):
         'data': 'error'
     }
 
+@app.route('/api/edit-route/<int:flight_route>', methods=['put'])
+def edit_route(flight_route):
+    data= request.json
+    pass
+
 @app.route('/api/flight-schedule', methods=['post'])
 def create_flight_schedule():
     data = request.json
@@ -189,6 +182,7 @@ def create_flight_schedule():
     price_type_1= data.get('price_type_1')
     price_type_2= data.get('price_type_2')
     airport_between_list= data.get('airportBetweenList')
+
     try:
         f = dao.create_flight_sche(depart_airport=depart_airport,
                                    arrival_airport=arrival_airport,
@@ -269,21 +263,12 @@ def search_flight_schedule():
 @app.route('/flight-list')
 def flight_list():
     admin_rules= dao.get_rule_admin()
-
     return render_template('flightList.html', admin_rules= admin_rules)
 
 @app.route('/ticket/<int:flight_id>')
 def get_ticket(flight_id):
     ticket_type= request.args.get('ticket-type')
     f = dao.get_flight_sche_json(flight_id)
-    # user_id= current_user.get_id()
-    # data_customers= session['ticket']['customers_info'][0]['data']
-    # quantity_customers= session['ticket']['customers_info'][0]['quantity']
-    #
-    # name_customer= []
-    # for name in range(0, quantity_customers):
-    #     name_customer.append(data_customers[name]['name'])
-    # ticket_id= dao.get_list_id_ticket(session['ticket']['f_id'], name_customer, user_id)
     seat_active= dao.get_seat_number_active(flight_id)
     return render_template('ticket.html',ticket_type=ticket_type, f=f,
                            user_role=UserRole, seat_active= seat_active)
@@ -291,10 +276,11 @@ def get_ticket(flight_id):
 @app.route('/bill_ticket/<int:f_id>')
 def bill_ticket(f_id):
     user_id = current_user.get_id()
+    quantity_customers= int(session['ticket']['customers_info'][0]['quantity'])
     flight_id = session['ticket']['f_id']
-    package_price = session['ticket']['package_price']
+    package_price = (int(session['ticket']['package_price'])/ quantity_customers)
     ticket_type = session['ticket']['ticket_type']
-    ticket_price = (int(session['ticket']['total']) - int(package_price))
+    ticket_price = ((int(session['ticket']['total']))/ quantity_customers- package_price)
     for d in range(len(session['ticket']['customers_info'][0]['data'])):
         cr = dao.create_ticket(user_id=user_id, flight_id=flight_id,
                                customer_id=session['ticket']['customers_info'][0]['data'][d]['id'],
@@ -312,8 +298,8 @@ def bill_ticket(f_id):
         msg.body = ('Bạn đã thanh toán thành công: ' + str(session['ticket']['total']) +
                     ' VND. Chúc bạn có một chuyến đi tốt lành')
         mail.send(msg)
-    ticket_list_json=dao.get_ticket_list_json(user_id= user_id)
-    return render_template('billTicket.html', ticket_list_json= ticket_list_json)
+    ticket_list_json=dao.get_ticket_list_json(user_id= user_id, quantity_customers= quantity_customers)
+    return render_template('billTicket.html', ticket_list_json= ticket_list_json, quantity_customers= quantity_customers)
 
 
 @app.route('/api/ticket/<int:f_id>', methods=['post'])
@@ -330,23 +316,6 @@ def create_ticket(f_id):
             'status': 500,
             'data': "Chỉ có thể đặt tối đa %s vé!" % remain_ticket
         }
-    # if data['user_role'] == 'UserRole.STAFF' or data['user_role'] == 'UserRole.ADMIN':
-    #     check_time = dao.check_time_ticket(id, is_user=False)
-    #     if not check_time['state']:
-    #         return {
-    #             'status': 500,
-    #             'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
-    #         }
-    #     # pay_ticket(data['f_id'], is_staff=True)
-    # else:
-    # check_time = dao.check_time_ticket(id)
-    # import pdb
-    # pdb.set_trace()
-    # if not check_time['state']:
-    #     return {
-    #         'status': 500,
-    #         'data': "Không thể đặt vé cách giờ bay trước %s tiếng!" % check_time['min']
-    #     }
     return {
         'status': 200,
         'data': data['f_id']
@@ -391,6 +360,30 @@ def list_flight_payment(f_id):
     return render_template('listFlightChoose.html',
                            quantity_ticket= quantity_ticket, quantity_customers= quantity_customers, data= data)
 
+@app.route('/api/get_stats_revenue/<int:month>', methods=['post'])
+def get_stats_revenue(month):
+    if int(month).__eq__(0):
+        return dao.get_revenue_stats_json_list()
+    return dao.get_revenue_stats_json_list(month)
+
+@app.route('/api/get_stats_ticket/<int:month>', methods=['post'])
+def get_stats_ticket(month):
+    if int(month).__eq__(0):
+        return dao.get_ticket_stats_json_list()
+    return dao.get_ticket_stats_json_list(month)
+
+
+@app.route('/api/get_stats_flight/<int:month>', methods=['post'])
+def get_stats_flight(month):
+    if int(month).__eq__(0):
+        return dao.get_flight_stats_json_list()
+    return dao.get_flight_stats_json_list(month)
+
+@app.route('/api/get_stats_total/<int:month>', methods=['post'])
+def get_stats_total(month):
+    if int(month).__eq__(0):
+        return dao.get_data_stats_json_list()
+    return dao.get_data_stats_json_list(month)
 
 @login.user_loader
 def user_load(user_id):
@@ -404,4 +397,4 @@ def common_attributes():
 
 if __name__ == '__main__':
     from QLChuyenBay.admin import *
-    app.run( debug=True, host='localhost', port=5002)
+    app.run(debug=True, host='localhost', port=5002)
