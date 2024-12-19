@@ -5,7 +5,7 @@
 {%block content %}
 <datalist id="airports">
     {% for a in airport_list %}
-    <option value="{{ a.id }} - {{ a }}">
+    <option value="{{ a.id }}. {{ a }}">
     </option>
     {% endfor %}
 </datalist>

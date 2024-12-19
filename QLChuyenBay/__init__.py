@@ -7,10 +7,11 @@ from flask_login import LoginManager
 from flask_mail import *
 from flask_principal import Principal
 import stripe
+from urllib.parse import quote
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:12345678@localhost/qlchuyenbay?charset=utf8mb4'
+app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:%s@localhost/qlchuyenbay?charset=utf8mb4' % quote("Tphus@2102")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
 app.secret_key='jiugyvIU*YGUFT*&&^T&GUHBOHIGY&(*)(U*HIJBHVFYFY%^&^&^&(*)*YUGBHOIB48451'
 

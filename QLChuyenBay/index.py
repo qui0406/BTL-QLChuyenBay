@@ -239,6 +239,7 @@ def search_flight_schedule():
     time_start= data.get('time_start')
     ticket_type= data.get('ticket_type')
 
+
     try:
         inp_search = dao.get_inp_search_json(departure_airport_id=departure_airport_id,
                                              departure_airport_name=departure_airport_name,
@@ -267,7 +268,9 @@ def search_flight_schedule():
 
 @app.route('/flight-list')
 def flight_list():
-    return render_template('flightList.html')
+    admin_rules= dao.get_rule_admin()
+
+    return render_template('flightList.html', admin_rules= admin_rules)
 
 @app.route('/ticket/<int:flight_id>')
 def get_ticket(flight_id):
@@ -287,7 +290,28 @@ def get_ticket(flight_id):
 
 @app.route('/bill_ticket/<int:f_id>')
 def bill_ticket(f_id):
-    user_id= current_user.get_id()
+    user_id = current_user.get_id()
+    flight_id = session['ticket']['f_id']
+    package_price = session['ticket']['package_price']
+    ticket_type = session['ticket']['ticket_type']
+    ticket_price = (int(session['ticket']['total']) - int(package_price))
+    for d in range(len(session['ticket']['customers_info'][0]['data'])):
+        cr = dao.create_ticket(user_id=user_id, flight_id=flight_id,
+                               customer_id=session['ticket']['customers_info'][0]['data'][d]['id'],
+                               ticket_price=ticket_price,
+                               ticket_type=ticket_type, package_price=package_price,
+                               customer_email=session['ticket']['customers_info'][0]['data'][d]['id_customer'],
+                               customer_phone=session['ticket']['customers_info'][0]['data'][d]['phone'],
+                               customer_name=session['ticket']['customers_info'][0]['data'][d]['name'],
+                               seat_number=session['ticket']['customers_info'][0]['data'][d]['seat_number'])
+
+    if current_user.user_role.value == UserRole.USER.value:
+        email = dao.get_email_by_user(user_id)
+        msg = Message(subject='Thông báo về việc thanh toán vé máy bay PhuQuiAirFlight',
+                      sender='anhqui04062004@gmail.com', recipients=[email])
+        msg.body = ('Bạn đã thanh toán thành công: ' + str(session['ticket']['total']) +
+                    ' VND. Chúc bạn có một chuyến đi tốt lành')
+        mail.send(msg)
     ticket_list_json=dao.get_ticket_list_json(user_id= user_id)
     return render_template('billTicket.html', ticket_list_json= ticket_list_json)
 
@@ -351,49 +375,7 @@ def create_checkout_session(f_id):
         )
     except Exception as e:
         return str(e)
-    else:
-        user_id = current_user.get_id()
-        flight_id = session['ticket']['f_id']
-        package_price = session['ticket']['package_price']
-        ticket_type = session['ticket']['ticket_type']
-        ticket_price= (int(session['ticket']['total']) - int(package_price))
-        for d in range(len(session['ticket']['customers_info'][0]['data'])):
-            cr = dao.create_ticket(user_id=user_id, flight_id=flight_id,
-                                   customer_id= session['ticket']['customers_info'][0]['data'][d]['id'],
-                                   ticket_price= ticket_price,
-                                   ticket_type=ticket_type, package_price=package_price,
-                                   customer_email=  session['ticket']['customers_info'][0]['data'][d]['id_customer'],
-                                   customer_phone=  session['ticket']['customers_info'][0]['data'][d]['phone'],
-                                   customer_name=  session['ticket']['customers_info'][0]['data'][d]['name'],
-                                   seat_number=  session['ticket']['customers_info'][0]['data'][d]['seat_number'])
-
     return redirect(checkout_session.url, code= 303)
-
-
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    payload = request.data
-    sig_header = request.headers['Stripe-Signature']
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
-        )
-    except ValueError as e:
-        # Invalid payload
-        return 'Invalid payload', 400
-    except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
-        return 'Invalid signature', 400
-    if event['type'] == 'checkout.session.completed':
-        user_id = current_user.get_id()
-        email = dao.get_email_by_user(user_id)
-        session = event['data']['object']
-        msg = Message(subject='Thông báo về việc thanh toán vé máy bay PhuQuiAirFlight',
-                      sender='anhqui04062004@gmail.com', recipients=[email])
-        msg.body = ('Bạn đã thanh toán thành công: ' + str(session['ticket']['total']) +
-                    ' VND. Chúc bạn có một chuyến đi tốt lành')
-        mail.send(msg)
-    return 'succedd', 200
 
 
 @app.route('/error')
@@ -403,7 +385,11 @@ def error():
 @login_required
 @app.route('/list-flight-payment/<int:f_id>')
 def list_flight_payment(f_id):
-    return render_template('listFlightChoose.html')
+    quantity_customers= int(session['ticket']['customers_info'][0]['quantity'])
+    data= session['ticket']['customers_info'][0]['data']
+    quantity_ticket= dao.count_ticket()
+    return render_template('listFlightChoose.html',
+                           quantity_ticket= quantity_ticket, quantity_customers= quantity_customers, data= data)
 
 
 @login.user_loader
