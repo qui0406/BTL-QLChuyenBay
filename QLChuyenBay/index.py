@@ -165,6 +165,11 @@ def delete_route(route_id):
         'data': 'error'
     }
 
+@app.route('/api/edit-route/<int:flight_route>', methods=['put'])
+def edit_route(flight_route):
+    data= request.json
+    pass
+
 @app.route('/api/flight-schedule', methods=['post'])
 def create_flight_schedule():
     data = request.json
@@ -177,6 +182,7 @@ def create_flight_schedule():
     price_type_1= data.get('price_type_1')
     price_type_2= data.get('price_type_2')
     airport_between_list= data.get('airportBetweenList')
+
     try:
         f = dao.create_flight_sche(depart_airport=depart_airport,
                                    arrival_airport=arrival_airport,
@@ -270,10 +276,11 @@ def get_ticket(flight_id):
 @app.route('/bill_ticket/<int:f_id>')
 def bill_ticket(f_id):
     user_id = current_user.get_id()
+    quantity_customers= int(session['ticket']['customers_info'][0]['quantity'])
     flight_id = session['ticket']['f_id']
-    package_price = session['ticket']['package_price']
+    package_price = (int(session['ticket']['package_price'])/ quantity_customers)
     ticket_type = session['ticket']['ticket_type']
-    ticket_price = (int(session['ticket']['total']) - int(package_price))
+    ticket_price = ((int(session['ticket']['total']))/ quantity_customers- package_price)
     for d in range(len(session['ticket']['customers_info'][0]['data'])):
         cr = dao.create_ticket(user_id=user_id, flight_id=flight_id,
                                customer_id=session['ticket']['customers_info'][0]['data'][d]['id'],
@@ -291,8 +298,8 @@ def bill_ticket(f_id):
         msg.body = ('Bạn đã thanh toán thành công: ' + str(session['ticket']['total']) +
                     ' VND. Chúc bạn có một chuyến đi tốt lành')
         mail.send(msg)
-    ticket_list_json=dao.get_ticket_list_json(user_id= user_id)
-    return render_template('billTicket.html', ticket_list_json= ticket_list_json)
+    ticket_list_json=dao.get_ticket_list_json(user_id= user_id, quantity_customers= quantity_customers)
+    return render_template('billTicket.html', ticket_list_json= ticket_list_json, quantity_customers= quantity_customers)
 
 
 @app.route('/api/ticket/<int:f_id>', methods=['post'])
