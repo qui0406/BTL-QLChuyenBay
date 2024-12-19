@@ -183,4 +183,3 @@ btnAccept.onclick=(e)=>{
         Swal.fire("Lỗi", err.data, "error")
     })
 }
-

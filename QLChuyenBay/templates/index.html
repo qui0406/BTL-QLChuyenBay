@@ -4,17 +4,22 @@
 
 {%block content %}
 <datalist id="airports">
-    {% for i in airport_list %}
-    <option value="{{ i.id }}. {{ i }}">
+    {% for a in airport_list %}
+    <option value="{{ a.id }}. {{ a }}">
     </option>
     {% endfor %}
 </datalist>
-<div class="">
-    <h2 class="text-center fw-bold my-5">
-        Tìm chuyến bay
-    </h2>
-    <div class="justify-content-center row">
-        <form action="javascript:;" class="w-50 my-auto p-4 bg-white shadow-lg rounded-1">
+<h2 class="text-center fw-bold my-2">
+    Tìm chuyến bay
+</h2>
+<div class=" d-flex justify-content-around w-100">
+
+    <div class="aircraft-image d-none d-lg-block">
+        <img src="https://img.static-af.com/images/media/E56219E9-21C7-4BB0-B7A5F5353A5140D3/" class="rounded w-45"
+             alt="">
+    </div>
+    <div class="search-form justify-content-center row">
+        <form action="javascript:;" class=" my-auto p-4 bg-white shadow-lg rounded-1">
             <div class="d-flex gap-3">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="ticketType" id="ticketType-1" checked>
@@ -57,5 +62,4 @@
     </div>
 </div>
 <script src="{{url_for('static', filename='js/index.js')}}"></script>
-
 {%endblock%}

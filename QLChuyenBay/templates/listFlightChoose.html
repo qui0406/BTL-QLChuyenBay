@@ -28,7 +28,7 @@
     </tr>
     {%endfor%}
 </table>
-    <h4 class="text text-center text-success">Tổng số tiền phải thanh toán: <span id="price_total">{{ "{:,.0f}".format(session['ticket']['total'])}} VNĐ</span></h4>
+     <h4 class="text text-center text-success">Tổng số tiền phải thanh toán: <span id="price_total">{{ "{:,.0f}".format(session['ticket']['total'])}} VNĐ</span></h4>
 
 <form action="/create-checkout-session/{{session['ticket']['f_id']}}" method="POST">
      <button type="submit" id="btn-checkout" class="btn btn-success">
