@@ -168,6 +168,26 @@ def delete_route(route_id):
 @app.route('/api/edit-route/<int:flight_route>', methods=['put'])
 def edit_route(flight_route):
     data= request.json
+    departure_airport = data.get('departure_airport')
+    arrival_airport = data.get('arrival_airport')
+    flight_route_id= flight_route
+
+    if departure_airport and arrival_airport:
+        route_exists= dao.check_route_exists(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
+                                        arrival_airport_id= dao.get_id_by_name_airport(arrival_airport))
+
+        ed = dao.edit_flight_route(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
+                                   arrival_airport_id= dao.get_id_by_name_airport(arrival_airport), id= flight_route_id)
+
+        if ed:
+            return {
+                'status': 200,
+                'data': 'success'
+            }
+    return {
+        'status': 500,
+        'data': 'error'
+    }
     pass
 
 @app.route('/api/flight-schedule', methods=['post'])

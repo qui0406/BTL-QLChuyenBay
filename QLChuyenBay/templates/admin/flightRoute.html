@@ -55,8 +55,8 @@
   <div class="modal-content">
     <span class="close">&times;</span>
     <p>Cập nhật thông tin tuyến bay:</p>
-    <input type="text" placeholder="Sân bay đi"><br>
-    <input type="text" placeholder="Sân bay đến"><br>
+    <input id="edit_departure" type="text" placeholder="Sân bay đi"><br>
+    <input id="edit_arrival" type="text" placeholder="Sân bay đến"><br>
       <input id="editData" type="submit" class="btn btn-info" value="Cập nhật">
   </div>
 </div>
@@ -102,11 +102,36 @@
     const modal = document.getElementById('modal');
     const btn = document.getElementById('open-modal');
     const span = document.getElementsByClassName('close')[0];
-    const editData= document.getElementById('editData')
+    const btnEditData= document.getElementById('editData')
 
     function editRoute(id) {
         modal.style.display = 'block';
+        event.stopPropagation()
 
+        const editDeparture= document.getElementById('edit_departure')
+        const editArrival= document.getElementById('edit_arrival')
+
+        btnEditData.onclick=()=>{
+           fetch(`/api/edit-route/${id}`, {
+                method: "put",
+                body: JSON.stringify({
+                    'departure_airport': editDeparture.value,
+                    'arrival_airport': editArrival.value
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json()).then(data => {
+                if(data.status==200){
+                    Swal.fire({
+                      title: "Thành công!",
+                      text: "You clicked the button!",
+                      icon: "success"
+                    });
+                    window.location.reload()
+                }
+            })
+        }
     }
 
 
