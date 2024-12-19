@@ -8,7 +8,7 @@ from QLChuyenBay.models import User, UserRole, Rule, AirPort, FlightRoute, Fligh
 import hashlib
 import re
 import locale
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, extract, and_
 
 locale.setlocale(locale.LC_ALL, 'vi_VN')
 
@@ -364,31 +364,23 @@ def get_seat_number_active(f_id):
         seat_arr.append(s.seat_number)
     return seat_arr
 
-def route_list_states():
-    return FlightRoute.query.join(FlightSchedule, FlightSchedule.flight_route_id.__eq__(FlightRoute.id), isouter= True)\
-        .add_column(func.count(FlightSchedule.id))\
-        .group_by(FlightRoute.id).all()
+# Thông ke
+def route_stats_in_month_json(id, total):
+    return {
+        'flight_route': get_depart_and_arrival_name_json(id),
+        'total': total
+    }
+
+def get_depart_and_arrival_name_json(id):
+    fr= FlightRoute.query.get(id)
+    return {
+        'id': id,
+        'departure_airport': get_airport_by_id(fr.departure_airport_id).name,
+        'arrival_airport': get_airport_by_id(fr.arrival_airport_id).name
+    }
 
 
-def get_data_flight_sche_states():
-    return db.session.query(FlightSchedule.flight_route_id, func.count(Ticket.id),
-                         func.sum(Ticket.ticket_price + Ticket.ticket_package_price).label("total_price")) \
-        .join(Ticket, Ticket.flight_sche_id.__eq__(FlightSchedule.id), isouter=True)\
-        .group_by(FlightSchedule.flight_route_id )\
-        .order_by(desc("total_price")).all()
-
-
-# def get_total_ticket_revenue_per_route():
-#     return db.session.query(FlightRoute.id, func.sum(Ticket.ticket_price + Ticket.ticket_package_price).label('total_revenue')) \
-#         .select_from(FlightSchedule) \
-#         .join(Ticket, FlightSchedule.id == Ticket.flight_sche_id, isouter=True) \
-#         .group_by(FlightRoute.id).all()
-
-def get_ticket_in_flight_stats():
-    return db.session.query(FlightSchedule.id, func.count(Ticket.id), func.sum(Ticket.ticket_price).label('total_price'))\
-        .join(Ticket, Ticket.flight_sche_id.__eq__(FlightSchedule.id), isouter= True)\
-        .group_by(FlightSchedule.id).order_by(desc('total_price')).all()
-
+# Tinh tong doanh thu theo tung tuyen bay
 def get_total_ticket_revenue_per_route():
     query = db.session.query(
         FlightRoute.id.label('flight_route_id'),
@@ -399,53 +391,16 @@ def get_total_ticket_revenue_per_route():
         .group_by(FlightRoute.id)
     return query.all()
 
-
-
-def get_total_ticket_revenue_per_route_each_month(target_month):
+def get_total_ticket_revenue_per_route_each_month(m):
     query = db.session.query(FlightRoute.id,
         func.sum(Ticket.ticket_price + Ticket.ticket_package_price).label('total_revenue'))\
         .select_from(FlightRoute) \
         .join(FlightSchedule, FlightRoute.id == FlightSchedule.flight_route_id) \
         .join(Ticket, FlightSchedule.id == Ticket.flight_sche_id) \
         .group_by(FlightRoute.id, func.month(Ticket.created_at)) \
-        .filter(func.month(Ticket.created_at) == target_month) \
+        .filter(func.month(Ticket.created_at) == m) \
         .all()
     return query
-
-
-def get_total_ticket_quantity_per_route():
-    query = db.session.query(
-        FlightRoute.id, func.count(Ticket.id).label('total_ticket')) \
-        .select_from(FlightRoute) \
-        .join(FlightSchedule, FlightRoute.id == FlightSchedule.flight_route_id) \
-        .join(Ticket, FlightSchedule.id == Ticket.flight_sche_id) \
-        .group_by(FlightRoute.id)
-    return query.all()
-
-def get_total_ticket_quantity_per_route_each_month(target_month):
-    return db.session.query(FlightRoute.id,
-        func.count(Ticket.id).label('total_ticket'))\
-        .select_from(FlightRoute) \
-        .join(FlightSchedule, FlightRoute.id == FlightSchedule.flight_route_id) \
-        .join(Ticket, FlightSchedule.id == Ticket.flight_sche_id) \
-        .group_by(FlightRoute.id, func.month(Ticket.created_at)) \
-        .filter(func.month(Ticket.created_at) == target_month) \
-        .all()
-
-def get_depart_and_arrival_name_json(id):
-    fr= FlightRoute.query.get(id)
-    return {
-        'id': id,
-        'departure_airport': get_airport_by_id(fr.departure_airport_id).name,
-        'arrival_airport': get_airport_by_id(fr.arrival_airport_id).name
-    }
-
-def route_stats_in_month_json(id, total):
-    return {
-        'flight_route': get_depart_and_arrival_name_json(id),
-        'total_revenue': total
-    }
-
 
 def get_revenue_stats_json_list(m=None):
     if m is None:
@@ -453,6 +408,7 @@ def get_revenue_stats_json_list(m=None):
     else:
         stats = get_total_ticket_revenue_per_route_each_month(m)
     stats_list = []
+
     total_price = 0
     for s in stats:
         if s[0]:
@@ -464,8 +420,30 @@ def get_revenue_stats_json_list(m=None):
         'total_price': total_price,
     }
 
+
+#Tinh tong ve theo tung tuyen bay
+def get_total_ticket_quantity_per_route():
+    query = db.session.query(
+        FlightRoute.id, func.count(Ticket.id).label('total_ticket')) \
+        .select_from(FlightRoute) \
+        .join(FlightSchedule, FlightRoute.id == FlightSchedule.flight_route_id) \
+        .join(Ticket, FlightSchedule.id == Ticket.flight_sche_id) \
+        .group_by(FlightRoute.id)
+    return query.all()
+
+def get_total_ticket_quantity_per_route_each_month(m):
+    query= db.session.query(FlightRoute.id,
+        func.count(Ticket.id).label('total_ticket'))\
+        .select_from(FlightRoute) \
+        .join(FlightSchedule, FlightRoute.id == FlightSchedule.flight_route_id) \
+        .join(Ticket, FlightSchedule.id == Ticket.flight_sche_id) \
+        .group_by(FlightRoute.id, func.month(Ticket.created_at)) \
+        .filter(func.month(Ticket.created_at) == m) \
+        .all()
+    return query
+
 def get_ticket_stats_json_list(m=None):
-    if m is None:
+    if not m:
         stats = get_total_ticket_quantity_per_route()
     else:
         stats = get_total_ticket_quantity_per_route_each_month(m)
@@ -476,9 +454,109 @@ def get_ticket_stats_json_list(m=None):
             total_ticket = total_ticket + int(s[1])
         obj = route_stats_in_month_json(s[0], s[1])
         stats_list.append(obj)
+
     return {
         'data': stats_list,
         'total_ticket': total_ticket,
+    }
+
+#Tinh so chuyen bay cua tung tuyen bay
+def get_total_flight_quantity_per_route():
+    return db.session.query(FlightRoute.id,
+            func.count(FlightSchedule.id)) \
+            .join(FlightSchedule, FlightRoute.id.__eq__(FlightSchedule.flight_route_id), isouter=True) \
+            .group_by(FlightRoute.id).order_by(FlightRoute.id.asc()).all()
+
+def get_total_flight_quantity_per_route_each_month(m):
+    return db.session.query(FlightRoute.id,
+            func.count(FlightSchedule.id), func.month(FlightSchedule.created_date)) \
+            .join(FlightSchedule, FlightRoute.id.__eq__(FlightSchedule.flight_route_id), isouter=True) \
+            .group_by(FlightRoute.id, func.month(FlightSchedule.created_date)) \
+            .filter(func.month(FlightSchedule.created_date) == m).order_by(FlightRoute.id.asc()).all()
+
+def get_flight_stats_json_list(m=None):
+    if not m:
+        stats = get_total_flight_quantity_per_route()
+    else:
+        stats = get_total_flight_quantity_per_route_each_month(m)
+    stats_list = []
+    total_flight = 0
+    for s in stats:
+        if s[1]:
+            total_flight = total_flight + int(s[1])
+        obj = route_stats_in_month_json(s[0], s[1])
+        stats_list.append(obj)
+    return {
+        'data': stats_list,
+        'total_flight': total_flight,
+    }
+
+#Tong thu
+def get_total_data_stats():
+   return db.session.query(
+      FlightRoute.id,
+      db.func.count(FlightSchedule.id).label('num_schedules'),
+      db.func.count(Ticket.id).label('num_tickets'),
+      db.func.sum(db.func.coalesce(Ticket.ticket_package_price, 0) + Ticket.ticket_price).label('total_revenue'))\
+       .join(FlightSchedule, FlightRoute.id.__eq__(FlightSchedule.flight_route_id), isouter= True)\
+       .join(Ticket, FlightSchedule.id.__eq__(Ticket.flight_sche_id), isouter= True)\
+       .group_by(FlightRoute.id).order_by(FlightRoute.id).all()
+
+def get_total_data_stats_per_month(m):
+   return db.session.query(
+      FlightRoute.id,
+      db.func.count(FlightSchedule.id),
+      db.func.count(Ticket.id),
+      db.func.sum(db.func.coalesce(Ticket.ticket_package_price, 0) + Ticket.ticket_price).label('total_revenue'))\
+       .join(FlightSchedule, FlightRoute.id == FlightSchedule.flight_route_id, isouter= True)\
+       .join(Ticket, FlightSchedule.id == Ticket.flight_sche_id, isouter= True)\
+        .filter(db.func.month(FlightSchedule.created_date) == m)\
+        .group_by(FlightRoute.id).order_by(FlightRoute.id).all()
+
+def get_total_data_stats_per_quarter(q):
+    return db.session.query(FlightRoute.id,
+        db.func.count(FlightSchedule.id).label('flight_count'),
+        db.func.count(Ticket.id).label('ticket_count'),
+        db.func.sum(db.func.coalesce(Ticket.ticket_package_price, 0) + Ticket.ticket_price).label('total_revenue')) \
+        .join(FlightSchedule, FlightRoute.id.__eq__(FlightSchedule.flight_route_id), isouter=True) \
+        .join(Ticket, FlightSchedule.id.__eq__(Ticket.flight_sche_id), isouter=True) \
+        .filter(func.extract('quarter', FlightSchedule.created_date) == q) \
+        .group_by(FlightRoute.id) \
+        .order_by(FlightRoute.id) \
+        .all()
+
+def get_data_stats_json(id, total_flight, total_ticket, total_price):
+    return {
+        'flight_route': get_depart_and_arrival_name_json(id),
+        'total_flight': total_flight,
+        'total_ticket': total_ticket,
+        'total_price': total_price or 0
+    }
+
+def get_data_stats_json_list(m=None):
+    if m is None:
+        stats = get_total_data_stats()
+    else:
+        stats = get_total_data_stats_per_month(m)
+    stats_list = []
+    total_price = 0
+    total_ticket = 0
+    total_flight= 0
+    for s in stats:
+        if s[3]:
+            total_price = total_price + int(s[3])
+        total_ticket = total_ticket + int(s[2])
+        total_flight= total_flight + int(s[1])
+        obj = get_data_stats_json(s[0], s[1], s[2], s[3])
+        stats_list.append(obj)
+        if total_price:
+            for sl in stats_list:
+                sl['flight_rate'] = float(sl['total_flight'] / total_flight) * 100
+    return {
+        'data': stats_list,
+        'total_price': total_price,
+        'total_flight': total_flight,
+        'total_ticket': total_ticket
     }
 
 def get_user_by_id(user_id):
