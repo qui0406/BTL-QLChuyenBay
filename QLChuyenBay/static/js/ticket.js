@@ -44,18 +44,33 @@ addBtn.onclick=()=>{
      customer = listCustomer[listCustomer.length - 1]
     if (current < 3) {
         const html = `
-            <div class="customer-info d-flex gap-4 bg-white p-2 rounded-2 mt-3">
+            <div class="customer-info d-flex flex-wrap gap-4 bg-white p-2 rounded-2">
                 <div class="flex-grow-1 mb-3">
-                    <label for="name-${current + 1}" class="fw-bold form-label">Họ và tên: </label>
-                    <input placeholder="Nguyễn Văn A" required type="text" minlength="4" name="name-${current + 1}" class="name-${current + 1} form-control" id="name-${current + 1}">
+                    <label for="name-1" class="form-label">Họ và tên:</label>
+                    <input value="Nguyễn Văn B" placeholder="Nguyễn Văn B" required minlength="4"
+                           type="text" name="name-1" class="name-1 form-control" id="name-1">
                 </div>
                 <div class="flex-grow-1 mb-3">
-                    <label for="phone-${current + 1}" class="fw-bold form-label">Số điện thoại: </label>
-                    <input placeholder="XXXXXXXXXX" required type="text" minlength="10" maxlength="10" name="phone-${current + 1}" class="phone-${current + 1} form-control" id="phone-${current + 1}">
+                    <label for="cccd-1" class="form-label">CCCD:</label>
+                    <input value="096204015159" placeholder="096204015159" required minlength="12" maxlength="12"
+                           type="text" name="cccd-1" class="cccd-1 form-control" id="cccd-1">
                 </div>
                 <div class="flex-grow-1 mb-3">
-                    <label for="id-${current + 1}" class="fw-bold form-label">CMND/CCCD: </label>
-                    <input placeholder="XXXXXXXXXX" required type="text" minlength="10" maxlength="10" name="id-${current + 1}" class="id-${current + 1} form-control" id="id-${current + 1}">
+                    <label for="dob-1" class="form-label">Ngày sinh:</label>
+                    <input value="2004-02-21"placeholder="YYYY-MM-DD" required type="date"
+                           name="dob-1" class="dob-1 form-control" id="dob-1">
+                </div>
+                <!-- Ngắt dòng tại đây -->
+                <div class="w-100"></div>
+                <div class="flex-grow-1 mb-3">
+                    <label for="phone-1" class="form-label">Số điện thoại:</label>
+                    <input value="1234567890" placeholder="XXXXXXXXXX" required minlength="10" maxlength="10"
+                           type="text" name="phone-1" class="phone-1 form-control" id="phone-1">
+                </div>
+                <div class="flex-grow-1 mb-3">
+                    <label for="id-1" class="form-label">Email:</label>
+                    <input value="abc@gmail.com" placeholder="abc@gmail.com" required type="email"
+                           name="id-1" class="id-1 form-control" id="id-1">
                 </div>
             </div>
         `

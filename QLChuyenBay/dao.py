@@ -101,8 +101,6 @@ def edit_flight_route(departure_airport_id, arrival_airport_id, id):
         db.session.commit()
     return route
 
-
-
 def create_flight_sche(depart_airport, arrival_airport, time_start, time_end,
                        quantity_1st_ticket, quantity_2nd_ticket, price_type_1, price_type_2):
     route_flight_id= FlightRoute.query.filter(FlightRoute.departure_airport_id.__eq__(depart_airport),
