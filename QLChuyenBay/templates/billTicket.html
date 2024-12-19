@@ -31,4 +31,14 @@
 </table>
 {% endfor %}
 
+
+<button class="w-100 btn btn-success" id="redirectHome" type="submit">
+    Quay về trang chủ
+</button>
+<script>
+    document.getElementById('redirectHome').onclick=()=>{
+        window.location.href='/'
+    }
+</script>
+
 {% endblock %}

@@ -175,7 +175,11 @@ def edit_route(flight_route):
     if departure_airport and arrival_airport:
         route_exists= dao.check_route_exists(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
                                         arrival_airport_id= dao.get_id_by_name_airport(arrival_airport))
-
+        if route_exists:
+            return {
+                'status': 500,
+                'data': 'error'
+            }
         ed = dao.edit_flight_route(departure_airport_id= dao.get_id_by_name_airport(departure_airport),
                                    arrival_airport_id= dao.get_id_by_name_airport(arrival_airport), id= flight_route_id)
 

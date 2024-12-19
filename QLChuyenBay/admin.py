@@ -15,6 +15,9 @@ class Authenticated(ModelView):
         else:
             return abort(403, 'Unauthorized Access')
 
+class AuthenticatedView(BaseView):
+    def is_accessible(self):
+        return current_user.is_authenticated
 
 class AuthenticatedAdminView(BaseView):
     def is_accessible(self):
@@ -68,6 +71,11 @@ class UserView(AuthenticatedAdmin):
     column_list = ('username', 'name')
     column_labels = dict(username='Tên đăng nhập', name='Họ tên', images="Ảnh đại diện", user_role="Vai trò")
 
+class HomeView(AuthenticatedView):
+    @expose('/')
+    def __index__(self):
+        return self.render('index.html')
+
 class AirportView(AuthenticatedAdmin):
     column_searchable_list = ['name']
     column_labels = dict(name='Tên sân bay')
@@ -107,4 +115,5 @@ admin.add_view(FlightScheduleView(FlightSchedule, db.session, name= 'Lập lịc
 admin.add_view(RouteFlightView(name= 'Tuyến bay'))
 admin.add_view(RulesView(name='Quản lý quy định'))
 admin.add_view(StatsView(name= 'Thống kê'))
+admin.add_view(HomeView(name= 'Trang khách hàng'))
 admin.add_view(LogoutView(name= 'Đăng xuất'))
