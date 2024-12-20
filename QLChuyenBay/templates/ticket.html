@@ -5,6 +5,7 @@
     <h1 class="fw-bold">Đặt vé</h1>
     <div class="fst-italic">Điền thông tin và xem lại đặt chỗ.</div>
 </div>
+
 <div class="mt-4 gap-3 d-flex ">
     <form class="flex-grow-1 shadow-lg p-3">
         <div>
@@ -185,6 +186,9 @@
 </div>
 
 <style>
+#test {
+    background-color: yellow;
+}
 
 </style>
 
@@ -196,6 +200,22 @@
            check{{s}}.checked= true
            check{{s}}.disabled = true
         {%endfor%}
+
+       {%for i in range(0, 199)%}
+            const chec{{i}}= document.getElementById('check{{i}}')
+            if({{i}} > 97 && {{ticket_type}}==1){
+                chec{{i}}.onclick=()=>{
+                    Swal.fire("Lỗi", "Vui lòng chọn loại ghế phù hợp với hạng vé!", "error")
+                    chec{{i}}.checked = false
+                }
+            }
+            if ({{i}} <= 97 && {{ticket_type}}==2){
+                chec{{i}}.onclick=()=>{
+                    Swal.fire("Lỗi", "Vui lòng chọn loại ghế phù hợp với hạng vé!", "error")
+                    chec{{i}}.checked = false
+                }
+            }
+       {%endfor%}
     }
 
 </script>

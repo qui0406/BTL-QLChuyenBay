@@ -1,6 +1,4 @@
 
-
-
 const addBtn = document.querySelector('#add-customer')
 const subBtn = document.querySelector('#sub-customer')
 const price = document.querySelector('.price span')
@@ -118,12 +116,13 @@ const chooseSeatNumber= document.querySelectorAll('.seat')
 const userChooseSeatNumber=[]
     Array.from(chooseSeatNumber).forEach((seatNumber, index) =>{
         seatNumber.onchange=()=>{
-//            if(userChooseSeatNumber.length > quantityCustomner){
-//                return Swal.fire("Lỗi", "Vui lòng chọn đúng số lượng ghế!", "error")
-//            }
             if(seatNumber.checked){
                 userChooseSeatNumber.push(index)
             }
+            if(!seatNumber.checked){
+                userChooseSeatNumber.pop()
+            }
+
         }
     })
 
@@ -176,10 +175,12 @@ btnAccept.onclick=(e)=>{
     if(userChooseSeatNumber.length < quantityCustomner){
          return Swal.fire("Lỗi", `Vui lòng chọn thêm ${quantityCustomner - userChooseSeatNumber.length} ghế!`, "error")
     }
+    if(userChooseSeatNumber.length > quantityCustomner){
+         return Swal.fire("Lỗi", `Vui lòng bỏ chọn ${ userChooseSeatNumber.length  - quantityCustomner} ghế!`, "error")
+    }
     if(userChooseSeatNumber.length==0){
         return Swal.fire("Lỗi", "Vui lòng chọn ghế!", "error")
     }
-    console.log(data)
     fetch(`/api/ticket/${fId}`, {
         method: 'POST',
         body: JSON.stringify(data),

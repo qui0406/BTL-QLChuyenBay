@@ -193,15 +193,19 @@
                         <td>{{ s['flight_route']['arrival_airport']}}</td>
                         <td>{{ s['total_flight']}} Chuyến</td>
                         <td>{{ s['total_ticket']}} Vé </td>
-                        <td>{{ s['total_price']}} VNĐ </td>
+                        <td>{{ '{:,.0f}'.format(s['total_price']) }} VNĐ </td>
                         <td>{{ s['flight_rate']}} % </td>
                     </tr>
                 {% endfor %}
-                    <tr>
-                        <td>Tổng doanh thu: {{ stats['total_price']}} VNĐ</td>
-                    </tr>
+
             </tbody>
         </table>
+        <div>
+            <h3 class="text text-center text text-danger">
+            Tổng doanh thu: {{ '{:,.0f}'.format(stats['total_price']) }} VNĐ
+            </h3>
+        </div>
+        <br><br>
     </div>
 </div>
 
