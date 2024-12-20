@@ -12,7 +12,9 @@
     <tr>
         <th scope="col">Mã vé</th>
         <th scope="col">Tên khách hàng</th>
+        <th scope="col">Ngày sinh</th>
         <th scope="col">Số điện thoại</th>
+        <th scope="col">CCCD</th>
         <th scope="col">Email</th>
         <th scope="col">Số ghế</th>
         <th scope="col">Loại vé</th>
@@ -21,8 +23,10 @@
     <tr>
         <th>{{quantity_ticket + t}}</th>
         <th>{{data[t].name}}</th>
-        <th>{{data[t].phone}}</th>
-        <th>{{data[t].id_customer}}</th>
+        <th>{{data[t].customer_date}}</th>
+        <th>{{data[t].customer_phone}}</th>
+        <th>{{data[t].customer_cccd}}</th>
+        <th>{{data[t].customer_email}}</th>
         <th>{{data[t].seat_number}}</th>
         <th>Vé hạng {{session['ticket']['ticket_type']}}</th>
     </tr>
@@ -41,13 +45,15 @@
     {%endif%}
 </form>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment-with-locales.min.js"></script>
+
 <script>
     const payCashier= document.getElementById('btn-pay-cashier')
     payCashier.onclick=()=>{
         event.preventDefault()
         window.location.href='/bill_ticket/{{session['ticket']['f_id']}}'
     }
-
 
 </script>
 {%endblock%}

@@ -47,29 +47,29 @@ addBtn.onclick=()=>{
             <div class="customer-info d-flex flex-wrap gap-4 bg-white p-2 rounded-2">
                 <div class="flex-grow-1 mb-3">
                     <label for="name-1" class="form-label">Họ và tên:</label>
-                    <input value="Nguyễn Văn B" placeholder="Nguyễn Văn B" required minlength="4"
+                    <input placeholder="Nguyễn Văn A" required minlength="4"
                            type="text" name="name-1" class="name-1 form-control" id="name-1">
                 </div>
                 <div class="flex-grow-1 mb-3">
                     <label for="cccd-1" class="form-label">CCCD:</label>
-                    <input value="096204015159" placeholder="096204015159" required minlength="12" maxlength="12"
+                    <input  placeholder="0123456789" required minlength="12" maxlength="12"
                            type="text" name="cccd-1" class="cccd-1 form-control" id="cccd-1">
                 </div>
                 <div class="flex-grow-1 mb-3">
                     <label for="dob-1" class="form-label">Ngày sinh:</label>
-                    <input value="2004-02-21"placeholder="YYYY-MM-DD" required type="date"
+                    <input placeholder="YYYY-MM-DD" required type="date"
                            name="dob-1" class="dob-1 form-control" id="dob-1">
                 </div>
                 <!-- Ngắt dòng tại đây -->
                 <div class="w-100"></div>
                 <div class="flex-grow-1 mb-3">
                     <label for="phone-1" class="form-label">Số điện thoại:</label>
-                    <input value="1234567890" placeholder="XXXXXXXXXX" required minlength="10" maxlength="10"
+                    <input placeholder="XXXXXXXXXX" required minlength="10" maxlength="10"
                            type="text" name="phone-1" class="phone-1 form-control" id="phone-1">
                 </div>
                 <div class="flex-grow-1 mb-3">
                     <label for="id-1" class="form-label">Email:</label>
-                    <input value="abc@gmail.com" placeholder="abc@gmail.com" required type="email"
+                    <input  placeholder="abc@gmail.com" required type="email"
                            name="id-1" class="id-1 form-control" id="id-1">
                 </div>
             </div>
@@ -137,7 +137,7 @@ btnAccept.onclick=(e)=>{
     const customerInfo = []
     let cntCustomer=0;
     Array.from(inputList).forEach((inp, index) => {
-        if (index == 2 || index == 5 || index == 8) {
+        if (index == 3 || index == 8 || index == 13) {
             const obj = {
                 id: index,
                 name: inp.value,
@@ -158,7 +158,8 @@ btnAccept.onclick=(e)=>{
     const data = {
         'contact_info': {
             'name': findInp('name').value,
-            'phone': findInp('phone').value
+            'phone': findInp('phone').value,
+            'email': findInp('email').value
         },
         'customers_info': [
             {

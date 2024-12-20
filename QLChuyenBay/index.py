@@ -297,6 +297,7 @@ def get_ticket(flight_id):
     return render_template('ticket.html',ticket_type=ticket_type, f=f,
                            user_role=UserRole, seat_active= seat_active)
 
+@login_required
 @app.route('/bill_ticket/<int:f_id>')
 def bill_ticket(f_id):
     user_id = current_user.get_id()
@@ -305,13 +306,14 @@ def bill_ticket(f_id):
     package_price = (int(session['ticket']['package_price'])/ quantity_customers)
     ticket_type = session['ticket']['ticket_type']
     ticket_price = ((int(session['ticket']['total']))/ quantity_customers- package_price)
+
     for d in range(len(session['ticket']['customers_info'][0]['data'])):
         cr = dao.create_ticket(user_id=user_id, flight_id=flight_id,
                                customer_id=session['ticket']['customers_info'][0]['data'][d]['id'],
                                ticket_price=ticket_price,
                                ticket_type=ticket_type, package_price=package_price,
                                customer_email=session['ticket']['customers_info'][0]['data'][d]['customer_email'],
-                               customer_phone=session['ticket']['customers_info'][0]['data'][d]['phone'],
+                               customer_phone=session['ticket']['customers_info'][0]['data'][d]['customer_phone'],
                                customer_name=session['ticket']['customers_info'][0]['data'][d]['name'],
                                seat_number=session['ticket']['customers_info'][0]['data'][d]['seat_number'],
                                customer_cccd= session['ticket']['customers_info'][0]['data'][d]['customer_cccd'],
@@ -321,7 +323,7 @@ def bill_ticket(f_id):
         email = dao.get_email_by_user(user_id)
         msg = Message(subject='Thông báo về việc thanh toán vé máy bay PhuQuiAirFlight',
                       sender='anhqui04062004@gmail.com', recipients=[email])
-        msg.body = ('Bạn đã thanh toán thành công: ' + str(session['ticket']['total']) +
+        msg.body = ('Bạn đã thanh toán thành công: ' + "{:,.0f}".format(session['ticket']['total']) +
                     ' VND. Chúc bạn có một chuyến đi tốt lành')
         mail.send(msg)
     ticket_list_json=dao.get_ticket_list_json(user_id= user_id, quantity_customers= quantity_customers)
@@ -334,7 +336,6 @@ def create_ticket(f_id):
     id = data.get('f_id')
     type_ticket= data.get('ticket_type')
     session['ticket']= data
-
     remain_ticket=dao.get_ticket_remain(id, type_ticket)
 
     if remain_ticket < data['customers_info'][0]['quantity']:
@@ -382,6 +383,7 @@ def error():
 def list_flight_payment(f_id):
     quantity_customers= int(session['ticket']['customers_info'][0]['quantity'])
     data= session['ticket']['customers_info'][0]['data']
+
     quantity_ticket= dao.count_ticket()
     return render_template('listFlightChoose.html',
                            quantity_ticket= quantity_ticket, quantity_customers= quantity_customers, data= data)

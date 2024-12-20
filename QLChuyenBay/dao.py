@@ -276,6 +276,8 @@ def get_ticket_json(t_id, quantity):
         'ticket_package_price': t.ticket_package_price,
         'customer_name': c.customer_name,
         'customer_phone': c.customer_phone,
+        'customer_cccd': c.customer_cccd,
+        'customer_email': c.customer_email,
         'customer_id': c.id,
         'created_at': t.created_at,
         'quantity': quantity
@@ -341,6 +343,10 @@ def get_latest_ticket():
     ticket = Ticket.query.order_by(Ticket.created_at.desc()).first()
     return ticket.id
 
+def check_seat_and_flight_sche_exist(seat_number, flight_sche_id):
+    return Seat.query.filter(Seat.flight_sche_id.__eq__(flight_sche_id), Seat.seat_number.__eq__(seat_number)).first()
+
+
 def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_name, customer_phone,
                   customer_email, customer_id, user_id, seat_number, customer_cccd, customer_date):
     f = FlightSchedule.query.filter(FlightSchedule.id.__eq__(flight_id), FlightSchedule.i_act.__eq__(True),
@@ -351,19 +357,25 @@ def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_
         f.ticket2_book_quantity = f.ticket2_book_quantity + 1
     cus = save_customer(customer_name=customer_name, customer_phone=customer_phone,
                         customer_email= customer_email, customer_cccd=customer_cccd, customer_date= customer_date)
+
     t = Ticket(author_id=user_id, flight_sche_id=flight_id, customer_id=customer_id,
                ticket_type=ticket_type, ticket_price= ticket_price, ticket_package_price= package_price, created_at=datetime.datetime.now())
     db.session.add(t)
     db.session.commit()
 
-    ticket_id= get_latest_ticket()
-    s = save_seat_number(seat_number=seat_number, ticket_id= ticket_id, flight_sche_id= flight_id)
-    db.session.add(cus, s)
-    db.session.commit()
+    if not check_seat_and_flight_sche_exist(flight_sche_id= flight_id, seat_number= seat_number):
+        ticket_id= get_latest_ticket()
+        s = save_seat_number(seat_number=seat_number, ticket_id= ticket_id, flight_sche_id= flight_id)
+        db.session.add(cus, s)
+        db.session.commit()
+        return {
+            "cus":cus,
+            "ticket": t,
+            'seat': s
+        }
     return {
-        "cus":cus,
-        "ticket": t,
-        'seat': s
+        'status': 500,
+        'data': 'err'
     }
 
 def get_id_ticket(flight_sche_id, customer_id, author_id):
