@@ -158,7 +158,7 @@
 
                 {% for abw in d.between_list.data %}
 
-                <div> Sân bay trung gian {{ abw.airport_name }} (dừng khoảng {{ "{:,.0f}".format(abw.time_stay) }} phút)</div>
+                <div> Sân bay trung gian {{ abw.airport_name }} (dừng khoảng {{ abw.time_stay}} phút)</div>
 
                 {% endfor %}
 

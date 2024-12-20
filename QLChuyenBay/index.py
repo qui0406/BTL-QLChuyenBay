@@ -378,15 +378,21 @@ def create_checkout_session(f_id):
 def error():
     return 'error'
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 @login_required
 @app.route('/list-flight-payment/<int:f_id>')
 def list_flight_payment(f_id):
     quantity_customers= int(session['ticket']['customers_info'][0]['quantity'])
     data= session['ticket']['customers_info'][0]['data']
+    f = dao.get_flight_sche_json(f_id)
+
 
     quantity_ticket= dao.count_ticket()
     return render_template('listFlightChoose.html',
-                           quantity_ticket= quantity_ticket, quantity_customers= quantity_customers, data= data)
+                           quantity_ticket= quantity_ticket, quantity_customers= quantity_customers, data= data,f=f)
 
 @app.route('/api/get_stats_revenue/<int:month>', methods=['post'])
 def get_stats_revenue(month):
@@ -422,6 +428,8 @@ def common_attributes():
     return {
         'user_role': UserRole
     }
+
+
 
 if __name__ == '__main__':
     from QLChuyenBay.admin import *

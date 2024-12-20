@@ -175,6 +175,31 @@ h1.subject {
     }
 }
 
+.abt-img3{
+      background-image: url('https://img.freepik.com/free-photo/view-professional-handshake-business-people_23-2150917018.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 200px;
+}
+
+.abt-img1{
+      background-image: url('https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/depositphotos53287017xl-1718329490377.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 200px;
+}
+
+.abt-img2{
+      background-image: url('https://www.pace.edu.vn/uploads/news/2023/08/3-loai-hinh-cham-soc-khach-hang.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 200px;
+}
+
+.card-img{
+    width: 300px;
+}
+
 @media (min-width: 889px) {
     .wrapper {
         width: 40%;
