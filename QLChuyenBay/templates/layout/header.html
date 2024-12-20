@@ -23,6 +23,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{url_for('about')}}">Liên hệ</a>
                 </li>
+                {%if current_user.is_authenticated and (current_user.user_role.value== 2 or current_user.user_role.value ==1) %}
+                    <li class="nav-item">
+                    <a class="nav-link" href="{{url_for('admin.index')}}">Về trang ADMIN</a>
+                </li>
+                {%endif%}
             </ul>
 
             <!-- Các mục đăng nhập, đăng ký hoặc avatar -->

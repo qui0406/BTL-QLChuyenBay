@@ -90,13 +90,15 @@ def user_login():
         if user:
             login_user(user=user)
             next_page = request.args.get('next')
+
             if user.user_role.value == UserRole.ADMIN.value:
                 return redirect('/admin')
             if user.user_role.value == UserRole.STAFF.value:
                 return redirect('/admin')
+
             return redirect(next_page) if next_page else render_template('index.html')
         else:
-            err_msg = "Username hoac password khong chinh xac!!!"
+            err_msg = "Tài khoản hoặc mật khẩu không chính xác!!!"
     return render_template('login.html', err_msg=err_msg)
 
 @login_required
