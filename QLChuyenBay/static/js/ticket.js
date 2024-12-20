@@ -141,8 +141,10 @@ btnAccept.onclick=(e)=>{
             const obj = {
                 id: index,
                 name: inp.value,
-                phone: inputList[index + 1].value,
-                id_customer: inputList[index + 2].value,
+                customer_cccd: inputList[index + 1].value,
+                customer_date: inputList[index + 2].value,
+                customer_phone: inputList[index + 3].value,
+                customer_email: inputList[index + 4].value,
                 seat_number: userChooseSeatNumber[cntCustomer++]
             }
             customerInfo.push(obj)

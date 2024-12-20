@@ -102,6 +102,8 @@ class Customer(BaseModel):
     customer_name= Column(String(100), nullable= False)
     customer_email= Column(String(50))
     customer_phone= Column(String(12), nullable= False)
+    customer_cccd= Column(String(12), nullable= False)
+    customer_date= Column(DateTime, nullable= False)
 
     def __str__(self):
         return self.name
@@ -132,7 +134,7 @@ def user_load(user_id):
 
 if __name__=="__main__":
     with app.app_context():
-       #db.create_all()
+      # db.create_all()
         pass
         # #
         # a1 = AirPort(name="Tân Sơn Nhất")

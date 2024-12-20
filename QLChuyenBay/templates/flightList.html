@@ -60,9 +60,7 @@
 
                     <div class="time text-center">
 
-                        {{ d.time_start.hour }}:{{ d.time_start.minute
-
-                        }}
+                        {{ d.time_start.hour }}:{{ d.time_start.minute }}
 
                         <br>
 
@@ -74,7 +72,7 @@
 
                         <div>..........<i class="fa-regular fa-clock"></i>..........</div>
 
-                        <div class="text-center">{{ d.time_end- d.time_start }}</div>
+                        <div class="text-center">{{ d.time_end- d.time_start }} giờ </div>
 
                     </div>
 
@@ -106,7 +104,7 @@
 
                      </div>
 
-                    <div>Ước tính: {{ d.time_end- d.time_start }}</div>
+                    <div>Ước tính khoảng: {{ d.time_end - d.time_start }} giờ</div>
 
                 </div>
 
@@ -160,7 +158,7 @@
 
                 {% for abw in d.between_list.data %}
 
-                <div> - Sân bay trung gian {{ abw.airport_name }} (dừng {{ abw.time_stay }} giờ)</div>
+                <div> Sân bay trung gian {{ abw.airport_name }} (dừng khoảng {{ "{:,.0f}".format(abw.time_stay) }} phút)</div>
 
                 {% endfor %}
 

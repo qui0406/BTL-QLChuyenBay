@@ -310,10 +310,12 @@ def bill_ticket(f_id):
                                customer_id=session['ticket']['customers_info'][0]['data'][d]['id'],
                                ticket_price=ticket_price,
                                ticket_type=ticket_type, package_price=package_price,
-                               customer_email=session['ticket']['customers_info'][0]['data'][d]['id_customer'],
+                               customer_email=session['ticket']['customers_info'][0]['data'][d]['customer_email'],
                                customer_phone=session['ticket']['customers_info'][0]['data'][d]['phone'],
                                customer_name=session['ticket']['customers_info'][0]['data'][d]['name'],
-                               seat_number=session['ticket']['customers_info'][0]['data'][d]['seat_number'])
+                               seat_number=session['ticket']['customers_info'][0]['data'][d]['seat_number'],
+                               customer_cccd= session['ticket']['customers_info'][0]['data'][d]['customer_cccd'],
+                                customer_date = session['ticket']['customers_info'][0]['data'][d]['customer_date'])
 
     if current_user.user_role.value == UserRole.USER.value:
         email = dao.get_email_by_user(user_id)

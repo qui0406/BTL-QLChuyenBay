@@ -137,7 +137,7 @@ def get_airport_by_id(a):
     return AirPort.query.filter(AirPort.id.__eq__(a)).first()
 
 def get_route_json(fs):
-    r= FlightRoute.query.filter(FlightRoute.id.__eq__(fs.flight_route_id)).first()
+    r= FlightRoute.query.get(fs.flight_route_id)
 
     if r:
         return {
@@ -179,27 +179,32 @@ def get_between_list(fs):
     return airport_between_list
 
 def get_flight_sche_json(id):
-    fs= FlightSchedule.query.filter(FlightSchedule.id.__eq__(id)).first()
-    fr= get_route_json(fs)
-    bwl= get_between_list(fs)
-
-    return {
-        "id": fs.id,
-        'departure_airport': fr['departure_airport'],
-        'arrival_airport': fr['arrival_airport'],
-        'time_start': fs.time_start,
-        'time_end': fs.time_end,
-        'ticket1_quantity': fs.ticket1_quantity,
-        'ticket2_quantity': fs.ticket2_quantity,
-        'ticket1_book_quantity': fs.ticket1_book_quantity,
-        'ticket2_book_quantity': fs.ticket2_book_quantity,
-        'price_type_1': "{:,.0f}".format(fs.price_type_1),
-        'price_type_2': "{:,.0f}".format(fs.price_type_2),
-        'between_list': {
-            'quantity': len(bwl),
-            'data': bwl
+    fs= FlightSchedule.query.get(id)
+    if fs:
+        fr= get_route_json(fs)
+        bwl= get_between_list(fs)
+        return {
+            "id": fs.id,
+            'departure_airport': fr['departure_airport'],
+            'arrival_airport': fr['arrival_airport'],
+            'time_start': fs.time_start,
+            'time_end': fs.time_end,
+            'ticket1_quantity': fs.ticket1_quantity,
+            'ticket2_quantity': fs.ticket2_quantity,
+            'ticket1_book_quantity': fs.ticket1_book_quantity,
+            'ticket2_book_quantity': fs.ticket2_book_quantity,
+            'price_type_1': "{:,.0f}".format(fs.price_type_1),
+            'price_type_2': "{:,.0f}".format(fs.price_type_2),
+            'between_list': {
+                'quantity': len(bwl),
+                'data': bwl
+            }
         }
+    return {
+        'status': 500,
+        'data': 'error'
     }
+
 
 def get_flight_sche_list():
     f_list = FlightSchedule.query.all()
@@ -316,8 +321,9 @@ def check_time_ticket(f_id, is_user= True):
         'state': (f_ts - n_ts) / 3600 > ar.time_buy_ticket
     }
 
-def save_customer(customer_name, customer_phone, customer_email):
-    c = Customer(customer_name=customer_name, customer_phone=customer_phone, customer_email=customer_email)
+def save_customer(customer_name, customer_phone, customer_email, customer_cccd, customer_date):
+    c = Customer(customer_name=customer_name, customer_phone=customer_phone, customer_email=customer_email,
+                 customer_cccd= customer_cccd, customer_date= customer_date)
     db.session.add(c)
     db.session.commit()
     return c
@@ -336,14 +342,15 @@ def get_latest_ticket():
     return ticket.id
 
 def create_ticket(flight_id, ticket_type, package_price, ticket_price, customer_name, customer_phone,
-                  customer_email, customer_id, user_id, seat_number):
+                  customer_email, customer_id, user_id, seat_number, customer_cccd, customer_date):
     f = FlightSchedule.query.filter(FlightSchedule.id.__eq__(flight_id), FlightSchedule.i_act.__eq__(True),
                                     FlightSchedule.i_del.__eq__(False)).first()
     if int(ticket_type) == 1:
         f.ticket1_book_quantity = f.ticket1_book_quantity + 1
     if int(ticket_type) == 2:
         f.ticket2_book_quantity = f.ticket2_book_quantity + 1
-    cus = save_customer(customer_name=customer_name, customer_phone=customer_phone, customer_email= customer_email)
+    cus = save_customer(customer_name=customer_name, customer_phone=customer_phone,
+                        customer_email= customer_email, customer_cccd=customer_cccd, customer_date= customer_date)
     t = Ticket(author_id=user_id, flight_sche_id=flight_id, customer_id=customer_id,
                ticket_type=ticket_type, ticket_price= ticket_price, ticket_package_price= package_price, created_at=datetime.datetime.now())
     db.session.add(t)
