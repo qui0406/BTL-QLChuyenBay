@@ -382,7 +382,7 @@ def error():
 
 @app.route('/about')
 def about():
-    comments = dao.get_comments(request.args.get('page', 1))
+    comments = dao.get_comments()
     return render_template('about.html', comments=comments)
 
 @login_required
@@ -435,24 +435,20 @@ def common_attributes():
 @app.route('/api/comments', methods=['post'])
 @login_required
 def add_comment():
-    comment_data = request.json
-    content = comment_data.get('content')
+    data = request.json
+    content = data.get('content')
+    user_id= current_user.get_id()
+    if content:
 
-    try:
-        c= dao.add_comment(content=content)
-    except:
-        return {'status': 404, 'err_msg':'Loi binh luan'}
-    return {'status': 201, 'comment':{
-        'id': c.id,
-        'content': c.content,
-        'created_date': c.created_date,
-        'user':{
-            'username': current_user.username,
-            'avatar': current_user.avatar
+        c= dao.add_comment(content=content, user_id= user_id)
+        return {
+            'status': 200,
+            'data': 'success'
         }
-
-    }}
-
+    return {
+        'status': 500,
+        'err': 'Lỗi bình luận'
+    }
 
 
 

@@ -1,6 +1,7 @@
 
 import json, os
 
+from flask import url_for
 from flask_login import current_user
 from sqlalchemy.sql.operators import desc_op
 import datetime
@@ -417,26 +418,38 @@ def get_depart_and_arrival_name_json(id):
     }
 
 #Them binh luan
-def add_comment(content):
-    c = Comment(content=content,user=current_user)
-
+def add_comment(content, user_id):
+    c = Comment(content=content,customer_id=user_id)
     db.session.add(c)
     db.session.commit()
-
     return c
 
-
-def get_comments(page):
-    page_size = app.config["CMT_SIZE"]
-    start = (page -1)*page_size
-
-    q =  Comment.query.order_by(Comment.id).all()
-    return q
-
-
 def get_username_by_id(id):
-    return User.query.get(id).name
+    return User.query.get(id)
 
+def get_avatar_by_id(id):
+    return User.query.get(id).avatar
+
+def get_comments(quantity=10):
+    comments = Comment.query.order_by(Comment.created_date.desc()).limit(quantity).all()
+    list_comments=[]
+    for i in comments:
+        if get_avatar_by_id(i.customer_id):
+            info={
+                'user_name': get_user_by_id(i.customer_id).name,
+                'content': i.content,
+                'avatar': get_avatar_by_id(i.customer_id)
+            }
+            list_comments.append(info)
+        else:
+            info = {
+                'user_name': get_user_by_id(i.customer_id).name,
+                'content': i.content,
+                'avatar': '{{url_for(static, filename="images/avatar_male.jpg")}}',
+                'created_date': i.created_date
+            }
+            list_comments.append(info)
+    return list_comments
 
 
 # Tinh tong doanh thu theo tung tuyen bay

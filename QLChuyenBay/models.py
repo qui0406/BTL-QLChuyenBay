@@ -144,8 +144,8 @@ def user_load(user_id):
 
 if __name__=="__main__":
     with app.app_context():
-       #db.create_all()
-        pass
+       db.create_all()
+       # pass
         # #
         # a1 = AirPort(name="Tân Sơn Nhất")
         # a2 = AirPort(name="Nội Bài")
