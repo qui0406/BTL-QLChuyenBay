@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from QLChuyenBay import db, login, app
 from datetime import datetime
 from enum import Enum as UserEnum
@@ -30,6 +30,7 @@ class User(BaseModel, UserMixin):
     active = Column(Boolean, default=True)
     joined_date = Column(DateTime, default=datetime.now())
     user_role = Column(Enum(UserRole), default=UserRole.USER)
+    comments = relationship('Comment', backref='user',lazy=True)
 
     def __str__(self):
         return self.name
@@ -126,6 +127,15 @@ class Seat(BaseModel):
     flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id), nullable= False)
     ticket_id= Column(Integer, ForeignKey(Ticket.id), nullable= False)
     is_active= Column(Boolean, default= False)
+
+class Comment(BaseModel):
+    __table_args__ = {'extend_existing': True}
+    content = Column(String(255),nullable=False)
+    customer_id = Column(Integer,ForeignKey(User.id),nullable=False)
+    created_date = Column(DateTime, default=datetime.now())
+
+    def __str__(self):
+        return self.content
 
 
 @login.user_loader

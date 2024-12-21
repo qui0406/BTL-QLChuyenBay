@@ -1,10 +1,11 @@
 
 import json, os
 
+from flask_login import current_user
 from sqlalchemy.sql.operators import desc_op
 import datetime
 from QLChuyenBay import app, db
-from QLChuyenBay.models import User, UserRole, Rule, AirPort, FlightRoute, FlightSchedule, BetweenAirport, Ticket, Customer, Seat
+from QLChuyenBay.models import User, UserRole, Rule, AirPort, FlightRoute, FlightSchedule, BetweenAirport, Ticket, Customer, Seat, Comment
 import hashlib
 import re
 import locale
@@ -415,6 +416,28 @@ def get_depart_and_arrival_name_json(id):
         'arrival_airport': get_airport_by_id(fr.arrival_airport_id).name
     }
 
+#Them binh luan
+def add_comment(content):
+    c = Comment(content=content,user=current_user)
+
+    db.session.add(c)
+    db.session.commit()
+
+    return c
+
+
+def get_comments(page):
+    page_size = app.config["CMT_SIZE"]
+    start = (page -1)*page_size
+
+    q =  Comment.query.order_by(Comment.id).all()
+    return q
+
+
+def get_username_by_id(id):
+    return User.query.get(id).name
+
+
 
 # Tinh tong doanh thu theo tung tuyen bay
 def get_total_ticket_revenue_per_route():
@@ -597,3 +620,4 @@ def get_data_stats_json_list(m=None):
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
+

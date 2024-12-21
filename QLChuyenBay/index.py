@@ -382,7 +382,8 @@ def error():
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    comments = dao.get_comments(request.args.get('page', 1))
+    return render_template('about.html', comments=comments)
 
 @login_required
 @app.route('/list-flight-payment/<int:f_id>')
@@ -430,6 +431,30 @@ def common_attributes():
     return {
         'user_role': UserRole
     }
+
+@app.route('/api/comments', methods=['post'])
+@login_required
+def add_comment():
+    comment_data = request.json
+    content = comment_data.get('content')
+
+    try:
+        c= dao.add_comment(content=content)
+    except:
+        return {'status': 404, 'err_msg':'Loi binh luan'}
+    return {'status': 201, 'comment':{
+        'id': c.id,
+        'content': c.content,
+        'created_date': c.created_date,
+        'user':{
+            'username': current_user.username,
+            'avatar': current_user.avatar
+        }
+
+    }}
+
+
+
 
 
 

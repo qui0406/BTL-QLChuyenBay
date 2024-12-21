@@ -16,6 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
 app.secret_key='jiugyvIU*YGUFT*&&^T&GUHBOHIGY&(*)(U*HIJBHVFYFY%^&^&^&(*)*YUGBHOIB48451'
 
 app.config["PAGE_SIZE"] = 8
+app.config["CMT_SIZE"] = 10
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
 app.config["MAIL_PORT"]= 587
