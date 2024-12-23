@@ -258,8 +258,6 @@ def search_flight_schedule():
     arrival_airport_name= data.get('arrival_airport_name').strip()
     time_start= data.get('time_start')
     ticket_type= data.get('ticket_type')
-
-
     try:
         inp_search = dao.get_inp_search_json(departure_airport_id=departure_airport_id,
                                              departure_airport_name=departure_airport_name,
@@ -391,8 +389,6 @@ def list_flight_payment(f_id):
     quantity_customers= int(session['ticket']['customers_info'][0]['quantity'])
     data= session['ticket']['customers_info'][0]['data']
     f = dao.get_flight_sche_json(f_id)
-
-
     quantity_ticket= dao.count_ticket()
     return render_template('listFlightChoose.html',
                            quantity_ticket= quantity_ticket, quantity_customers= quantity_customers, data= data,f=f)
@@ -451,8 +447,29 @@ def add_comment():
     }
 
 
+@login_required
+@app.route('/find-ticket')
+def find_ticket():
+    return render_template('findTicket.html')
 
+@login_required
+@app.route('/ticket-request', methods=['post'])
+def res_ticket():
+    info_cus = request.json.get('info_cus')
+    customer = 'hahahhaha'
+    if customer:
+        return {
+            'status': 200,
+            'data': 'success'
+        }
+    return {
+        'status': 400
+    }
 
+@login_required
+@app.route('/response-ticket')
+def response_search():
+    return render_template('responseTicket.html')
 
 if __name__ == '__main__':
     from QLChuyenBay.admin import *

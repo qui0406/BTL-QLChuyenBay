@@ -631,6 +631,27 @@ def get_data_stats_json_list(m=None):
         'total_ticket': total_ticket
     }
 
+def get_info_user(info_user):
+
+    if len(info_user) == 12:
+        return Customer.query.filter(Customer.customer_cccd.__eq__(info_user)).first()
+    if len(info_user) == 10:
+        return Customer.query.filter(Customer.customer_phone.__eq__(info_user)).first()
+
+def get_ticket_by_id_customer(cus):
+    return Ticket.query.filter(Ticket.customer_id.__eq__(cus.id)).all()
+
+def get_ticket_by_customer(info_user):
+    cus= get_info_user(info_user=info_user)
+
+    if cus:
+        get_list_ticket= get_ticket_by_id_customer(cus)
+        t_list_json = []
+
+        for t in get_list_ticket:
+            t_list_json.append(get_ticket_json(t.id, 10))
+        return t_list_json
+
 def get_user_by_id(user_id):
     return User.query.get(user_id)
 

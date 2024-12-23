@@ -9,7 +9,6 @@
     <div class="d-flex align-items-center">
         <select id="select_time" class="select-type form-control" style="width: 100px">
             <option value="1" selected>Tháng</option>
-            <option value="2">Quý</option>
         </select>
         <select id="select_time_month" class="ml-3 select-month form-control" style="width: 120px">
                 <option value="0" selected>Toàn bộ</option>
@@ -162,7 +161,7 @@
                         <td>{{ s['flight_route']['id']}}</td>
                         <td>{{ s['flight_route']['departure_airport']}}</td>
                         <td>{{ s['flight_route']['arrival_airport']}}</td>
-                        <td>{{ s['flight_rate']}} % </td>
+                        <td>{{ "{:,.2f}".format(s['flight_rate']) }} % </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -198,7 +197,7 @@
                         <td>{{ s['total_flight']}} Chuyến</td>
                         <td>{{ s['total_ticket']}} Vé </td>
                         <td>{{ '{:,.0f}'.format(s['total_price']) }} VNĐ </td>
-                        <td>{{ s['flight_rate']}} % </td>
+                        <td>{{ "{:,.2f}".format(s['flight_rate']) }} % </td>
                     </tr>
                 {% endfor %}
 
@@ -300,7 +299,7 @@
             data: {
               labels: labels,
               datasets: [{
-                label: '# Doanh thu',
+                label: '#Vé',
                 data: data,
                 borderWidth: 5,
                 backgroundColor: colors,
@@ -423,7 +422,7 @@
                     <td>${d['flight_route']['id']}</td>
                     <td>${d['flight_route']['departure_airport']}</td>
                     <td>${d['flight_route']['arrival_airport']}</td>
-                    <td>${d['total'].toLocaleString()} VNĐ</td>
+                    <td>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(d['total'])}</td>
                 </tr>
             `
         }).join("")
@@ -479,7 +478,7 @@
                     <td>${d['flight_route']['id']}</td>
                     <td>${d['flight_route']['departure_airport']}</td>
                     <td>${d['flight_route']['arrival_airport']}</td>
-                    <td>${(d['total']) *100 / data['total_flight']} %</td>
+                    <td>${((d['total']) *100 / data['total_flight']).toFixed(2)} %</td>
                 </tr>
             `
         }).join("")
@@ -500,7 +499,7 @@
                     <td>${ d['total_flight']} Chuyến</td>
                     <td>${d['total_ticket']} Vé </td>
                     <td>${d['total_price'].toLocaleString()} VNĐ </td>
-                    <td>${d['flight_rate']} % </td>
+                    <td>${d['flight_rate'].toFixed(2)} % </td>
                 </tr>
             `
         }).join("")
