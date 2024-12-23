@@ -2,10 +2,10 @@
 
 {%block body%}
 
-<h1 class="text text-center text-success">BÁO CÁO THỐNG KÊ</h1>
+
 
 <div class="d-flex align-items-center justify-content-between">
-    <h1 class="text-center text-success my-3">Thống kê báo cáo</h1>
+    <h1 class="text-center my-3">Thống kê báo cáo</h1>
     <div class="d-flex align-items-center">
         <select id="select_time" class="select-type form-control" style="width: 100px">
             <option value="1" selected>Tháng</option>
@@ -38,14 +38,14 @@
 
 
 
-<div class="row">
-    <div class="col-md-6 col-12">
+<div class="row mt-3">
+    <div class="col-md-6 col-12 shadow-sm">
         <table class="table">
             <thead>
-                <tr>
+                <tr style="background-color:#1d6a85; color:#fff">
                     <th scope="col" class="title-revenue text-center" colspan="4">BÁO CÁO DOANH THU</th>
                 </tr>
-                <tr>
+                <tr style="background-color:#fec107;">
                     <th>ID</th>
                     <th>Sân bay đi</th>
                     <th>Sân bay đến</th>
@@ -54,7 +54,7 @@
             </thead>
             <tbody id="body_revenue">
                 {% for s in stats['data']%}
-                <tr class="table_revenue">
+                <tr class="table_revenue " style="background-color:#d9feff;">
                     <td>{{ s['flight_route']['id'] }}</td>
                     <td>{{ s['flight_route']['departure_airport'] }}</td>
                     <td>{{ s['flight_route']['arrival_airport'] }}</td>
@@ -70,17 +70,19 @@
 </div>
 
 <br><br>
-<div class="row">
+<div class="w-100" style="background-color:#fec107; height:3px;"></div>
+
+<div class="row mt-5">
     <div id="chartTicket" class="col-md-6 col-12">
         <canvas id="chartTicket0"></canvas>
     </div>
-    <div class="col-md-6 col-12">
+    <div class="col-md-6 col-12 shadow-sm">
         <table class="table">
             <thead>
-                <tr>
-                    <th scope="col" class="title-ticket text-center" colspan="4">BÁO CÁO DOANH THU</th>
+                <tr style="background-color:#1d6a85; color:#fff">
+                    <th scope="col" class="title-ticket text-center" colspan="4">BÁO CÁO VÉ</th>
                 </tr>
-                <tr>
+                <tr style="background-color:#fec107;">
                     <th>Id</th>
                     <th>Sân bay đi</th>
                     <th>Sân bay đến</th>
@@ -89,7 +91,7 @@
             </thead>
             <tbody id="body_ticket">
                 {% for s in stats['data']%}
-                    <tr class="table_ticket">
+                    <tr class="table_ticket" style="background-color:#d9feff;">
                         <td>{{ s['flight_route']['id']}}</td>
                         <td>{{ s['flight_route']['departure_airport']}}</td>
                         <td>{{ s['flight_route']['arrival_airport']}}</td>
@@ -101,15 +103,16 @@
     </div>
 </div>
 <br><br>
+<div class="w-100" style="background-color:#fec107; height:3px;"></div>
 
-<div class="row">
-    <div class="col-md-6 col-12">
+<div class="row mt-5">
+    <div class="col-md-6 col-12 shadow-sm">
         <table class="table">
             <thead>
-                <tr>
-                    <th scope="col" class="title-flight text-center" colspan="4">BÁO CÁO DOANH THU</th>
+                <tr style="background-color:#1d6a85; color:#fff">
+                    <th scope="col" class="title-flight text-center" colspan="4">BÁO CÁO LƯỢT BAY</th>
                 </tr>
-                <tr>
+                <tr style="background-color:#fec107;">
                     <th>Id</th>
                     <th>Sân bay đi</th>
                     <th>Sân bay đến</th>
@@ -118,7 +121,7 @@
             </thead>
             <tbody id="body_flight">
                 {% for s in stats['data'] %}
-                    <tr class="table_flight">
+                    <tr class="table_flight" style="background-color:#d9feff;">
                         <td>{{ s['flight_route']['id']}}</td>
                         <td>{{ s['flight_route']['departure_airport']}}</td>
                         <td>{{ s['flight_route']['arrival_airport']}}</td>
@@ -134,18 +137,19 @@
     </div>
 </div>
 <br><br>
+<div class="w-100" style="background-color:#fec107; height:3px;"></div>
 
-<div class="row">
+<div class="row mt-5">
     <div id="chartRate" class="col-md-6 col-12">
         <canvas id="chartRate0"></canvas>
     </div>
     <div class="col-md-6 col-12">
-        <table class="table">
+        <table class="table shadow-sm">
             <thead>
-                <tr>
-                    <th scope="col" class="title-rate text-center" colspan="4">BÁO CÁO DOANH THU</th>
+                <tr style="background-color:#1d6a85; color:#fff">
+                    <th scope="col" class="title-rate text-center" colspan="4">TỈ LỆ LƯỢT BAY</th>
                 </tr>
-                <tr>
+                <tr style="background-color:#fec107;">
                     <th>Id</th>
                     <th>Sân bay đi</th>
                     <th>Sân bay đến</th>
@@ -154,7 +158,7 @@
             </thead>
             <tbody id="body_rate">
                {% for s in stats['data'] %}
-                    <tr class="table_rate">
+                    <tr class="table_rate" style="background-color:#d9feff;">
                         <td>{{ s['flight_route']['id']}}</td>
                         <td>{{ s['flight_route']['departure_airport']}}</td>
                         <td>{{ s['flight_route']['arrival_airport']}}</td>
@@ -166,16 +170,16 @@
     </div>
 </div>
 <br><br>
+<div class="w-100" style="background-color:#fec107; height:3px;"></div>
 
-
-<div class="row">
+<div class="row mt-5">
     <div class="col-12">
         <table class="table">
             <thead>
-                <tr>
+                <tr style="background-color:#1d6a85; color:#fff">
                     <th scope="col" class="title-total text-center" colspan="4">BÁO CÁO TỔNG</th>
                 </tr>
-                <tr >
+                <tr style="background-color:#fec107;">
                     <th>Id</th>
                     <th>Sân bay đi</th>
                     <th>Sân bay đến</th>
@@ -187,7 +191,7 @@
             </thead>
             <tbody id="body_total">
                 {% for s in stats['data'] %}
-                    <tr class="table_total">
+                    <tr class="table_total" style="background-color:#d9feff;">
                         <td>{{ s['flight_route']['id']}}</td>
                         <td>{{ s['flight_route']['departure_airport']}}</td>
                         <td>{{ s['flight_route']['arrival_airport']}}</td>
