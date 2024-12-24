@@ -141,6 +141,13 @@
                         });
                         window.location.reload()
                     }
+                    if(data==300){
+                         Swal.fire({
+                          icon: "error",
+                          title: "Oops...",
+                          text: "Tuyến bay đã được tạo lịch các chuyến bay. Vui lòng xóa tất cả các chuyến bay trước!",
+                        });
+                    }
                     if(data.status==500){
                         Swal.fire({
                           icon: "error",

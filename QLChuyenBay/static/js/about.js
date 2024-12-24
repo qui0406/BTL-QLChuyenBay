@@ -23,7 +23,6 @@ function addComment(){
                 <div class="row comments">
                     <div class="col-md-1 col-xs-4">
                         <img class="rounded-circle img-fluid"
-// loi  ne
                         src="${c.user.avatar}"
                         alt="">
                     </div>

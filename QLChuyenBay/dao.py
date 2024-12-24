@@ -1,6 +1,4 @@
-
 import json, os
-
 from flask import url_for
 from flask_login import current_user
 from sqlalchemy.sql.operators import desc_op
@@ -126,7 +124,8 @@ def create_flight_sche(depart_airport, arrival_airport, time_start, time_end,
         'data': 'error'
     }
 
-
+def check_flight_sche_in_route(id):
+    return FlightSchedule.query.filter(FlightSchedule.flight_route_id.__eq__(id)).first()
 
 def create_between_airport(airport_id, flight_sche_id, time_stay, note):
     bwa= BetweenAirport(airport_id=int(airport_id), flight_sche_id=int(flight_sche_id), time_stay=float(time_stay),
@@ -585,17 +584,6 @@ def get_total_data_stats_per_month(m):
         .filter(db.func.month(FlightSchedule.created_date) == m)\
         .group_by(FlightRoute.id).order_by(FlightRoute.id).all()
 
-def get_total_data_stats_per_quarter(q):
-    return db.session.query(FlightRoute.id,
-        db.func.count(FlightSchedule.id).label('flight_count'),
-        db.func.count(Ticket.id).label('ticket_count'),
-        db.func.sum(db.func.coalesce(Ticket.ticket_package_price, 0) + Ticket.ticket_price).label('total_revenue')) \
-        .join(FlightSchedule, FlightRoute.id.__eq__(FlightSchedule.flight_route_id), isouter=True) \
-        .join(Ticket, FlightSchedule.id.__eq__(Ticket.flight_sche_id), isouter=True) \
-        .filter(func.extract('quarter', FlightSchedule.created_date) == q) \
-        .group_by(FlightRoute.id) \
-        .order_by(FlightRoute.id) \
-        .all()
 
 def get_data_stats_json(id, total_flight, total_ticket, total_price):
     return {
@@ -632,7 +620,6 @@ def get_data_stats_json_list(m=None):
     }
 
 def get_info_user(info_user):
-
     if len(info_user) == 12:
         return Customer.query.filter(Customer.customer_cccd.__eq__(info_user)).first()
     if len(info_user) == 10:

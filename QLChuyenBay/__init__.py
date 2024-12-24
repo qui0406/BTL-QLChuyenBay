@@ -40,8 +40,3 @@ mail=Mail(app=app)
 db= SQLAlchemy(app=app)
 login= LoginManager(app=app)
 principals = Principal(app=app)
-
-# babel= Babel(app=app)
-# @babel.localeselector
-# def get_locale():
-#         return 'vi'
