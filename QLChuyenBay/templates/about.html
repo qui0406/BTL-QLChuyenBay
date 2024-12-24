@@ -84,7 +84,7 @@
     <div class="row comments mt-2  border border-2 p-2">
         <div class="col-md-1 col-xs-4">
             <img class="rounded-circle img-fluid"
-                 src="https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
+                 src="{{c.avatar}} "
                  alt="">
         </div>
         <div class="col-md-11 col-xs-8">
@@ -96,13 +96,30 @@
     {% endfor %}
 </div>
 <script>
-
-    window.onload  = function() {
-        let d = document.getElementsByClassName("myDate")
+    function addComment(){
+       let content = document.getElementById('floatingTextarea2');
+       fetch('/api/comments', {
+          method: 'POST',
+          body: JSON.stringify({
+              'content': content.value
+          }),
+          headers: {
+              'Content-Type': 'application/json'
+          }
+       })
+       .then(res => res.json())
+       .then(data => {
+          if(data.status==200){
+            window.location.reload()
+          }
+       })
+    }
+    let d = document.getElementsByClassName("myDate")
         for (let i =0; i< d.length; i++){
             d[i].innerText = moment(d[i].innerText).locale('vi').fromNow()
         }
-    }
+
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment-with-locales.min.js"></script>

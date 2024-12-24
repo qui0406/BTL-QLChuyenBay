@@ -418,7 +418,8 @@ def get_depart_and_arrival_name_json(id):
 
 #Them binh luan
 def add_comment(content, user_id):
-    c = Comment(content=content,customer_id=user_id)
+    c = Comment(content=content,customer_id=user_id, created_date= datetime.datetime.now())
+
     db.session.add(c)
     db.session.commit()
     return c
@@ -442,10 +443,10 @@ def get_comments(quantity=10):
             list_comments.append(info)
         else:
             info = {
-                'user_name': get_user_by_id(i.customer_id).name,
-                'content': i.content,
-                'avatar': '{{url_for(static, filename="images/avatar_male.jpg")}}',
-                'created_date': i.created_date
+               'user_name': get_user_by_id(i.customer_id).name,
+               'content': i.content,
+               'avatar': 'https://res.cloudinary.com/do43r8nr0/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1729400798/samples/man-portrait.jpg',
+               'created_date': i.created_date
             }
             list_comments.append(info)
     return list_comments

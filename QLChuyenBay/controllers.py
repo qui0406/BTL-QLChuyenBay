@@ -436,7 +436,6 @@ def add_comment():
     content = data.get('content')
     user_id= current_user.get_id()
     if content:
-
         c= dao.add_comment(content=content, user_id= user_id)
         return {
             'status': 200,

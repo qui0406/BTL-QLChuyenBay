@@ -21,7 +21,6 @@ class UserRole(UserEnum):
     USER = 3
 
 class User(BaseModel, UserMixin):
-    __table_args__ = {'extend_existing': True}
     name = Column(String(100), nullable=False)
     username = Column(String(100), nullable=False, unique= True)
     password = Column(String(100), nullable=False)
@@ -30,13 +29,14 @@ class User(BaseModel, UserMixin):
     active = Column(Boolean, default=True)
     joined_date = Column(DateTime, default=datetime.now())
     user_role = Column(Enum(UserRole), default=UserRole.USER)
+
     comments = relationship('Comment', backref='user',lazy=True)
+    rules= relationship('Rule', backref='user', lazy= True)
 
     def __str__(self):
         return self.name
 
 class Rule(BaseModel):
-    __table_args__ = {'extend_existing': True}
     min_time_flight= Column(Float, default=30)
     max_quantity_between_airport= Column(Integer, default=2)
     min_time_stay_airport= Column(Float, default= 20)
@@ -44,10 +44,10 @@ class Rule(BaseModel):
     time_book_ticket= Column(Float, default= 12)
     time_buy_ticket= Column(Float, default= 4)
     created_at= Column(DateTime, default= datetime.now())
+
     author_id= Column(Integer, ForeignKey(User.id))
 
 class AirPort(BaseModel):
-    __table_args__ = {'extend_existing': True}
     name= Column(String(100), nullable=False)
     # details= relationship('FlightRoute', backref='airport', lazy= True)
 
@@ -56,12 +56,10 @@ class AirPort(BaseModel):
 #
 class FlightRoute(BaseModel):
     __tablename__ = 'flight_routes'
-    __table_args__ = {'extend_existing': True}
     departure_airport_id= Column(Integer, ForeignKey(AirPort.id))
     arrival_airport_id= Column(Integer, ForeignKey(AirPort.id))
     created_date = Column(DateTime, default=datetime.now())
-    # flight_sche= relationship('FlightSchedule', backref='flightroute', lazy=True)
-    # flight_schedule = relationship('FlightSchedule', backref='flight_route', lazy=True)
+    flight_sche= relationship('FlightSchedule', backref='flight_routes', lazy=True)
 
     def __str__(self):
         return str(self.id)
@@ -82,15 +80,16 @@ class FlightSchedule(BaseModel):
     price_type_1= Column(Float, default=0)
     price_type_2= Column(Float, default=0)
     created_date = Column(DateTime, default=datetime.now())
-    # bw_airports = relationship('BetweenAirport', backref='flight_schedules', lazy= True)
+
+    bw_airports = relationship('BetweenAirport', backref='flight_schedules', lazy= True)
+    tickets = relationship('Ticket', backref='flight_schedules', lazy= True)
+
 
     def __str__(self):
         return str(self.id)
 
 class BetweenAirport(BaseModel):
     __tablename__ = 'between_airport'
-    __table_args__ = {'extend_existing': True}
-
     airport_id = Column(Integer, ForeignKey(AirPort.id))
     flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id))
 
@@ -99,7 +98,6 @@ class BetweenAirport(BaseModel):
     is_deleted = Column(Boolean, default=False)
 
 class Customer(BaseModel):
-    __table_args__ = {'extend_existing': True}
     customer_name= Column(String(100), nullable= False)
     customer_email= Column(String(50))
     customer_phone= Column(String(12), nullable= False)
@@ -111,7 +109,6 @@ class Customer(BaseModel):
 
 
 class Ticket(BaseModel):
-    __table_args__ = {'extend_existing': True}
     author_id = Column(Integer, ForeignKey(User.id), nullable=True)
     customer_id = Column(Integer, ForeignKey(Customer.id))
     flight_sche_id = Column(Integer, ForeignKey(FlightSchedule.id), nullable=True)
@@ -119,17 +116,16 @@ class Ticket(BaseModel):
     ticket_type= Column(Integer, nullable= False)
     ticket_package_price= Column(Integer, default=0)
     created_at= Column(DateTime, default= datetime.now())
-    #seat_id= relationship('Seat', backref='ticket', lazy=True, uselist=False)
+
+    seat_id= relationship('Seat', backref='ticket', lazy=True, uselist=False)
 
 class Seat(BaseModel):
-    __table_args__= {'extend_existing': True}
     seat_number= Column(Integer, nullable=False)
     flight_sche_id= Column(Integer, ForeignKey(FlightSchedule.id), nullable= False)
     ticket_id= Column(Integer, ForeignKey(Ticket.id), nullable= False)
     is_active= Column(Boolean, default= False)
 
 class Comment(BaseModel):
-    __table_args__ = {'extend_existing': True}
     content = Column(String(255),nullable=False)
     customer_id = Column(Integer,ForeignKey(User.id),nullable=False)
     created_date = Column(DateTime, default=datetime.now())
