@@ -14,7 +14,7 @@ app.add_url_rule('/validate', 'user_validate', controllers.user_validate, method
 app.add_url_rule('/reset-password', 'reset_pwd', controllers.reset_pwd, methods=['get', 'post'])
 app.add_url_rule('/register', 'user_register', controllers.user_register, methods=['get', 'post'])
 app.add_url_rule('/login-user', 'user_login', controllers.user_login, methods=['get', 'post'])
-app.add_url_rule('/user-logout', 'user_logout', login_required(controllers.user_login), methods=['get'])
+app.add_url_rule('/user-logout', 'user_logout', login_required(controllers.user_logout), methods=['get'])
 
 #Admin
 app.add_url_rule('/api/admin-rule', 'save_admin_rules', controllers.save_admin_rules, methods=['post'])
