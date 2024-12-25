@@ -1,14 +1,11 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship, backref
 from QLChuyenBay import db, login, app
-from datetime import datetime
 from enum import Enum as UserEnum
 import dao
 from flask_login import login_user
 from flask_login import UserMixin
 from datetime import datetime
-from sqlalchemy.ext.declarative import declarative_base
-
 
 class BaseModel(db.Model):
     __abstract__= True
@@ -44,12 +41,10 @@ class Rule(BaseModel):
     time_book_ticket= Column(Float, default= 12)
     time_buy_ticket= Column(Float, default= 4)
     created_at= Column(DateTime, default= datetime.now())
-
     author_id= Column(Integer, ForeignKey(User.id))
 
 class AirPort(BaseModel):
     name= Column(String(100), nullable=False)
-    # details= relationship('FlightRoute', backref='airport', lazy= True)
 
     def __str__(self):
         return self.name
@@ -105,7 +100,7 @@ class Customer(BaseModel):
     customer_date= Column(DateTime, nullable= False)
 
     def __str__(self):
-        return self.name
+        return self.customer_name
 
 
 class Ticket(BaseModel):

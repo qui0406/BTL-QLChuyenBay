@@ -20,10 +20,6 @@ def add_user(name, username, password, email, **kwarg):
     db.session.add(user)
     db.session.commit()
 
-def check_secure_password(password):
-    pattern = r"^(?=.*[a-z])(?=.*[A-Z]).{8,}$"
-    if re.match(pattern, password):
-        return True
 
 #Kiem tra tai khoan do co trong database hay khong
 def auth_user(username, password, role=UserRole.USER):
@@ -260,11 +256,6 @@ def search_flight_sche(departure_airport_id, arrival_airport_id, time_start, tic
             flight_schedule_list.append(f_sche)
         return flight_schedule_list
 
-def get_quantity_ticket():
-    type_1= FlightSchedule.ticket1_quantity
-    type_2= FlightSchedule.ticket2_quantity
-    return type_1 + type_2
-
 def get_ticket_json(t_id, quantity):
     t = Ticket.query.filter(Ticket.id.__eq__(t_id)).first()
     c = Customer.query.filter(Customer.id.__eq__(t.id)).first()
@@ -304,25 +295,6 @@ def get_ticket_remain(flight_id, ticket_type):
         remain = f.ticket2_quantity - f.ticket2_book_quantity
     return remain
 
-def get_admin_rules_latest():
-    ar = Rule.query.order_by(Rule.created_at.desc()).first()
-    return ar
-
-def check_time_ticket(f_id, is_user= True):
-    f = FlightSchedule.query.filter(FlightSchedule.i_act.__eq__(True), FlightSchedule.i_del.__eq__(False),
-                                    FlightSchedule.id.__eq__(f_id)).first()
-    ar = get_admin_rules_latest()
-    f_ts = f.time_start.timestamp()
-    n_ts = datetime.datetime.now().timestamp()
-    if is_user:
-        return {
-            'min': ar.time_book_ticket,
-            'state': (f_ts - n_ts) / 3600 > ar.time_book_ticket
-        }
-    return {
-        'min': ar.time_buy_ticket,
-        'state': (f_ts - n_ts) / 3600 > ar.time_buy_ticket
-    }
 
 def save_customer(customer_name, customer_phone, customer_email, customer_cccd, customer_date):
     c = Customer(customer_name=customer_name, customer_phone=customer_phone, customer_email=customer_email,
@@ -384,15 +356,6 @@ def get_id_ticket(flight_sche_id, customer_id, author_id):
                                Ticket.customer_id.__eq__(customer_id),
                                Ticket.author_id.__eq__(author_id)).first().id
 
-def get_list_id_ticket(flight_sche_id, customers, author_id):
-    arr_id_ticket=[]
-    for customer_id in customers:
-        id_ticket= get_id_ticket(flight_sche_id, customer_id, author_id)
-        arr_id_ticket.append(id_ticket)
-    return arr_id_ticket
-
-def get_id_ticket_latest(id):
-    return Ticket.query.get(id).first().id
 
 def get_seat_number_active(f_id):
     seat_arr=[]
@@ -642,4 +605,7 @@ def get_ticket_by_customer(info_user):
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
+
+
+
 
